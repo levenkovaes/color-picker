@@ -1,0 +1,36 @@
+@import "./common/variables";
+@import "./common/normalizecss";
+
+@font-face {
+  font-family: "Roboto";
+  src: url("../../assets/fonts/Roboto-Regular.ttf");
+}
+
+html {
+  font-family: "Roboto", sans-serif;
+  letter-spacing: 1px;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--dark-blue);
+  color: var(--yellow);
+  font-size: 18px;
+  padding: 50px;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+::selection {
+  background: var(--orange);
+  color: var(--yellow);
+}
+::-moz-selection {
+  background: var(--orange);
+  color: var(--yellow);
+}

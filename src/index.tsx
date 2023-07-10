@@ -1,21 +1,19 @@
+import "../src/assets/scss/input.scss";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { StrictMode } from "react";
-import { App } from "./App";
-import "../scss/input.scss";
 import { Provider } from "react-redux";
-import { store } from "./store/store";
 
-// ReactDOM.render(<App />, document.getElementById("root"));
+import { App } from "./App";
+import { store } from "./store/store";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
-
 root.render(
-  <StrictMode>
+  <React.StrictMode>
     <Provider store={store}>
       <App />
     </Provider>
-  </StrictMode>
+  </React.StrictMode>
 );
