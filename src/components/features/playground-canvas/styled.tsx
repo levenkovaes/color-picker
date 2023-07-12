@@ -5,9 +5,13 @@ export const SCanvas = styled.canvas<{
   width: number;
   height: number;
 }>`
-  margin: 40px 0 0;
+  /* margin: 40px 0 0; */
   /* width: clamp(100px, 100%, 1500px);
   height: clamp(100px, 68vh, 1500px); */
-  border: solid 1px var(--dark-green);
-  background-color: var(--white);
+  /* border: solid 1px var(--dark-green);
+  background-color: var(--white); */
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
 `;

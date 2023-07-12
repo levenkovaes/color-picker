@@ -7,8 +7,10 @@ export const PlaygroundCanvas = () => {
   const canvasRef = useRef(null);
 
   const { height, width } = useWindowDimensions();
-  const canvasWidth = (width * 70) / 100;
-  const canvasHeight = (height * 70) / 100;
+  const canvasWidth = width;
+  const canvasHeight = height;
+  // const canvasWidth = (width * 70) / 100;
+  // const canvasHeight = (height * 70) / 100;
 
   useEffect(() => {
     const colors = [
