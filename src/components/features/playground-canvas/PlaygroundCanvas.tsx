@@ -24,11 +24,17 @@ export const PlaygroundCanvas = () => {
     const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
 
     function Ball(this: any) {
-      this.x = Math.floor(Math.random() * canvasWidth);
-      this.y = Math.floor(Math.random() * canvasHeight);
-      this.vx = Math.floor(Math.random() * (4 - -4 + 1) + -4);
-      this.vy = Math.floor(Math.random() * (4 - -4 + 1) + -4);
       this.radius = Math.floor(Math.random() * (70 - 10 + 1) + 10);
+      this.x = Math.floor(
+        Math.random() * (canvasWidth - this.radius - this.radius + 1) +
+          this.radius
+      );
+      this.y = Math.floor(
+        Math.random() * (canvasHeight - this.radius - this.radius + 1) +
+          this.radius
+      );
+      this.vx = Math.floor(Math.random() * (4 - -4 + 1) + -4) || 2;
+      this.vy = Math.floor(Math.random() * (4 - -4 + 1) + -4) || 2;
       this.color = colors[Math.floor(Math.random() * colors.length)];
       this.draw = () => {
         ctx.beginPath();
@@ -38,10 +44,19 @@ export const PlaygroundCanvas = () => {
       };
     }
     // const ball = new (Ball as any)();
+    console.log(canvas.width);
 
     let ballArr: any = [];
 
-    for (let i = 0; i <= Math.floor(Math.random() * (15 - 5 + 1) + 5); i++) {
+    for (
+      let i = 0;
+      i <=
+      Math.floor(
+        Math.random() * (canvas.width / 35 - canvas.width / 100 + 1) +
+          canvas.width / 100
+      );
+      i++
+    ) {
       ballArr.push(new (Ball as any)());
     }
 
@@ -52,10 +67,16 @@ export const PlaygroundCanvas = () => {
         ball.draw();
         ball.x += ball.vx;
         ball.y += ball.vy;
-        if (ball.y + ball.vy > canvas.height || ball.y + ball.vy < 0) {
+        if (
+          ball.y + ball.vy + ball.radius > canvas.height ||
+          ball.y + ball.vy - ball.radius < 0
+        ) {
           ball.vy = -ball.vy;
         }
-        if (ball.x + ball.vx > canvas.width || ball.x + ball.vx < 0) {
+        if (
+          ball.x + ball.vx + ball.radius > canvas.width ||
+          ball.x + ball.vx - ball.radius < 0
+        ) {
           ball.vx = -ball.vx;
         }
       });
