@@ -1,11 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { People } from "./components/features/people/People";
-import { Person } from "./components/features/person/Person";
-import { Planet } from "./components/features/planet/Planet";
-import { Planets } from "./components/features/planets/Planets";
+import { ColorPicker } from "./components/pages/color-picker/ColorPicker";
 import { Home } from "./components/pages/home/Home";
 import { Layout } from "./components/pages/Layout";
+import { Paint } from "./components/pages/paint/Paint";
+import { Playground } from "./components/pages/playground/Playground";
 
 export const App = () => {
   return (
@@ -14,10 +13,11 @@ export const App = () => {
         <Route path="/">
           <Route index element={<Home />}></Route>
           <Route element={<Layout />}>
-            <Route path="planets" element={<Planets />}></Route>
-            <Route path="people" element={<People />}></Route>
-            <Route path="people/:personId" element={<Person />}></Route>
-            <Route path="planets/:planetId" element={<Planet />}></Route>
+            <Route path="playground" element={<Playground />}></Route>
+            <Route path="color-picker" element={<ColorPicker />}></Route>
+            <Route path="paint" element={<Paint />}></Route>
+            {/* <Route path="people/:personId" element={<Person />}></Route>
+            <Route path="planets/:planetId" element={<Planet />}></Route> */}
           </Route>
         </Route>
       </Routes>
