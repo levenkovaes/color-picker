@@ -1,5 +1,6 @@
 @import "./common/variables";
 @import "./common/normalizecss";
+@import "./common/toast";
 
 @font-face {
   font-family: "Roboto";
@@ -18,7 +19,7 @@ body {
   color: var(--dark-green);
   font-size: 18px;
   padding: 50px;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #root {

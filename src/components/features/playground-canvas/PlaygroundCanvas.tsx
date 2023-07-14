@@ -45,8 +45,6 @@ export const PlaygroundCanvas = () => {
         ctx.fill();
       };
     }
-    // const ball = new (Ball as any)();
-    console.log(canvas.width);
 
     let ballArr: any = [];
 

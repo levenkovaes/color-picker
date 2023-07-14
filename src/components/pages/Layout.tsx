@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import styled from "styled-components";
 
 import { SLink } from "../common/styled";
@@ -14,6 +15,7 @@ export const Layout = () => {
         <SLink to="/">Home</SLink>
       </SHeader>
       <main>
+        <ToastContainer />
         <Outlet />
       </main>
     </>

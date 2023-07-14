@@ -1,7 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
-import { smthSliceReducer } from "./features/smth/smthSlice";
+import { colorPickerSliceReducer } from "./features/color-picker/colorPickerSlice";
 
 export const rootReducer = combineReducers({
-  smth: smthSliceReducer,
+  colorPicker: colorPickerSliceReducer,
 });

@@ -20,6 +20,14 @@ export const SLink = styled(Link)`
 `;
 
 export const SH1 = styled.h1<{ $additionalCss?: FlattenSimpleInterpolation }>`
-  padding: 10px 0;
+  padding: 10px 0 40px;
+
   ${(props) => props.$additionalCss}
+`;
+
+export const SBtn = styled.button`
+  border: none;
+  :hover {
+    cursor: pointer;
+  }
 `;
