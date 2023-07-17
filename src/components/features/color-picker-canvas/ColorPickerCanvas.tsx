@@ -60,8 +60,8 @@ export const ColorPickerCanvas = () => {
 
       const imgData = ctx.getImageData(0, 0, imgWidth, imgHeight).data;
       const canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight).data;
-      const canvasRgbArr = buildRgb(canvasData);
 
+      const canvasRgbArr = buildRgb(canvasData);
       const rgbArr = buildRgb(imgData);
 
       // console.log(imgData);
@@ -71,10 +71,8 @@ export const ColorPickerCanvas = () => {
       const colorsRgb = quantization(rgbArr, 2);
       const filter = findBiggestColorRange(rgbArr) + "-filter";
 
-      console.log(imgData.length / 4 / imgWidth, imgHeight);
-
       const colorsIndex = colorsRgb.map(({ r, g, b }) => {
-        const index = rgbArr.findIndex((el) => {
+        let index = canvasRgbArr.findIndex((el) => {
           if (el.r === r && el.g === g && el.b === b) {
             return true;
           }
@@ -90,11 +88,8 @@ export const ColorPickerCanvas = () => {
           );
 
           if (filtered2ColorsMatch.length > 0) {
-            const newColor =
-              filtered2ColorsMatch[
-                Math.floor((filtered2ColorsMatch.length - 1) / 2)
-              ];
-            return rgbArr.findIndex((el) => {
+            const newColor = filtered2ColorsMatch[0];
+            index = canvasRgbArr.findIndex((el) => {
               if (
                 el.r === newColor.r &&
                 el.g === newColor.g &&
@@ -122,11 +117,8 @@ export const ColorPickerCanvas = () => {
               }
             );
 
-            const newColor =
-              filtered1ColorMatch[
-                Math.floor((filtered1ColorMatch.length - 1) / 2)
-              ];
-            return rgbArr.findIndex((el) => {
+            const newColor = filtered1ColorMatch[0];
+            index = canvasRgbArr.findIndex((el) => {
               if (
                 el.r === newColor.r &&
                 el.g === newColor.g &&
@@ -137,51 +129,35 @@ export const ColorPickerCanvas = () => {
               return false;
             });
           }
-
-          return 0;
         }
+
         return index;
       });
 
-      const finalColorsRgb = colorsIndex.map((index) => rgbArr[index]);
-
-      console.log(finalColorsRgb);
-      console.log(colorsIndex);
-
-      console.log(
-        ctx.getImageData(
-          Math.floor(colorsIndex[2] / imgWidth),
-          colorsIndex[2] % imgWidth,
-          1,
-          1
-        )
-      );
-      console.log(
-        rgbToHex(
-          ctx.getImageData(
-            (colorsIndex[0] % imgWidth) - 1,
-            Math.floor(colorsIndex[0] / imgWidth) - 1,
-            1,
-            1
-          ).data[0],
-          ctx.getImageData(
-            (colorsIndex[0] % imgWidth) - 1,
-            Math.floor(colorsIndex[0] / imgWidth) - 1,
-            1,
-            1
-          ).data[1],
-          ctx.getImageData(
-            (colorsIndex[0] % imgWidth) - 1,
-            Math.floor(colorsIndex[0] / imgWidth) - 1,
-            1,
-            1
-          ).data[2]
-        )
-      );
+      const finalColorsRgb = colorsIndex.map((index) => canvasRgbArr[index]);
 
       const colorsHex = finalColorsRgb.map((color) =>
         rgbToHex(color.r, color.g, color.b)
       );
+
+      const colorsCoords = colorsIndex.map((index) => {
+        return {
+          x: index % canvasWidth,
+          y: Math.floor(index / canvasWidth),
+        };
+      });
+
+      colorsCoords.forEach((el, index) => {
+        ctx.beginPath();
+        ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
+        ctx.fillStyle = colorsHex[index];
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#ffffff";
+        ctx.stroke();
+      });
 
       // //random
       //   const pixels = [];
