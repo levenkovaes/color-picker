@@ -47,7 +47,7 @@ export const buildRgb = (imageData: Uint8ClampedArray) => {
   return rgbValues;
 };
 
-const findBiggestColorRange = (rgbValues) => {
+export const findBiggestColorRange = (rgbValues) => {
   let rMin = Number.MAX_VALUE;
   let gMin = Number.MAX_VALUE;
   let bMin = Number.MAX_VALUE;

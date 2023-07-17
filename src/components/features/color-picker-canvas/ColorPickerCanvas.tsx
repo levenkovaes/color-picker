@@ -8,6 +8,7 @@ import {
 // import image from "../../../assets/imgs/image1.jpg";
 import useWindowDimensions, {
   buildRgb,
+  findBiggestColorRange,
   quantization,
   rgbToHex,
 } from "../../../utils/utils";
@@ -58,14 +59,131 @@ export const ColorPickerCanvas = () => {
       }
 
       const imgData = ctx.getImageData(0, 0, imgWidth, imgHeight).data;
+      const canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight).data;
+      const canvasRgbArr = buildRgb(canvasData);
 
-      //   console.log(buildRgb(imgData));
+      const rgbArr = buildRgb(imgData);
+
+      // console.log(imgData);
+      // console.log(buildRgb(imgData));
       //   console.log(quantization(buildRgb(imgData), 1));
 
-      const colors = quantization(buildRgb(imgData), 1).map((color) =>
+      const colorsRgb = quantization(rgbArr, 2);
+      const filter = findBiggestColorRange(rgbArr) + "-filter";
+
+      console.log(imgData.length / 4 / imgWidth, imgHeight);
+
+      const colorsIndex = colorsRgb.map(({ r, g, b }) => {
+        const index = rgbArr.findIndex((el) => {
+          if (el.r === r && el.g === g && el.b === b) {
+            return true;
+          }
+          return false;
+        });
+
+        if (index === -1) {
+          const filtered2ColorsMatch = rgbArr.filter(
+            ({ r: red, g: green, b: blue }) =>
+              (red === r && green === g) ||
+              (red === r && blue === b) ||
+              (green === g && blue === b)
+          );
+
+          if (filtered2ColorsMatch.length > 0) {
+            const newColor =
+              filtered2ColorsMatch[
+                Math.floor((filtered2ColorsMatch.length - 1) / 2)
+              ];
+            return rgbArr.findIndex((el) => {
+              if (
+                el.r === newColor.r &&
+                el.g === newColor.g &&
+                el.b === newColor.b
+              ) {
+                return true;
+              }
+              return false;
+            });
+          }
+
+          if (filtered2ColorsMatch.length === 0) {
+            const filtered1ColorMatch = rgbArr.filter(
+              ({ r: red, g: green, b: blue }) => {
+                switch (filter) {
+                  case "r-filter":
+                    return red === r;
+                  case "g-filter":
+                    return green === g;
+                  case "b-filter":
+                    return blue === b;
+                  default:
+                    return red === r;
+                }
+              }
+            );
+
+            const newColor =
+              filtered1ColorMatch[
+                Math.floor((filtered1ColorMatch.length - 1) / 2)
+              ];
+            return rgbArr.findIndex((el) => {
+              if (
+                el.r === newColor.r &&
+                el.g === newColor.g &&
+                el.b === newColor.b
+              ) {
+                return true;
+              }
+              return false;
+            });
+          }
+
+          return 0;
+        }
+        return index;
+      });
+
+      const finalColorsRgb = colorsIndex.map((index) => rgbArr[index]);
+
+      console.log(finalColorsRgb);
+      console.log(colorsIndex);
+
+      console.log(
+        ctx.getImageData(
+          Math.floor(colorsIndex[2] / imgWidth),
+          colorsIndex[2] % imgWidth,
+          1,
+          1
+        )
+      );
+      console.log(
+        rgbToHex(
+          ctx.getImageData(
+            (colorsIndex[0] % imgWidth) - 1,
+            Math.floor(colorsIndex[0] / imgWidth) - 1,
+            1,
+            1
+          ).data[0],
+          ctx.getImageData(
+            (colorsIndex[0] % imgWidth) - 1,
+            Math.floor(colorsIndex[0] / imgWidth) - 1,
+            1,
+            1
+          ).data[1],
+          ctx.getImageData(
+            (colorsIndex[0] % imgWidth) - 1,
+            Math.floor(colorsIndex[0] / imgWidth) - 1,
+            1,
+            1
+          ).data[2]
+        )
+      );
+
+      const colorsHex = finalColorsRgb.map((color) =>
         rgbToHex(color.r, color.g, color.b)
       );
 
+      // //random
       //   const pixels = [];
 
       //   for (let i = 0; i < 8; ++i) {
@@ -80,7 +198,7 @@ export const ColorPickerCanvas = () => {
       //     pixels.push(rgbToHex(data[0], data[1], data[2]));
       //   }
 
-      dispatch(addColors(colors));
+      dispatch(addColors(colorsHex));
     });
   }, [canvasWidth, canvasHeight, width, height, imgSrc, dispatch]);
 

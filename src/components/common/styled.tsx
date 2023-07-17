@@ -20,7 +20,7 @@ export const SLink = styled(Link)`
 `;
 
 export const SH1 = styled.h1<{ $additionalCss?: FlattenSimpleInterpolation }>`
-  padding: 10px 0 40px;
+  padding: 10px 0 24px;
 
   ${(props) => props.$additionalCss}
 `;
