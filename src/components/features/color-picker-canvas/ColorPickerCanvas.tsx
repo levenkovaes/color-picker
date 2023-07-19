@@ -51,6 +51,8 @@ export const ColorPickerCanvas = () => {
   };
 
   useEffect(() => {
+    if (!canvasWidth || !canvasHeight) return;
+
     const canvas: any = canvasRef.current;
     const ctx: CanvasRenderingContext2D = canvas.getContext("2d", {
       willReadFrequently: true,
@@ -203,6 +205,8 @@ export const ColorPickerCanvas = () => {
             const data = pixel.data;
             const color = rgbToHex(data[0], data[1], data[2]);
 
+            console.log(target);
+
             dispatch(changeColor({ index: target.index, color: color }));
 
             target.color = color;
@@ -260,16 +264,7 @@ export const ColorPickerCanvas = () => {
 
       dispatch(addColors(colorsHex));
     });
-  }, [
-    width,
-    height,
-    imgSrc,
-    dispatch,
-    targetHeight,
-    targetWidth,
-    canvasHeight,
-    canvasWidth,
-  ]);
+  }, [imgSrc, dispatch, targetHeight, targetWidth, canvasHeight, canvasWidth]);
 
   return (
     <SCanvas
