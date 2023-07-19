@@ -17,8 +17,7 @@ export const colorPickerSlice = createSlice({
       state.colors = action.payload;
     },
     changeColor: (state, action) => {
-      state.colors[state.colors.indexOf(action.payload.prev)] =
-        action.payload.next;
+      state.colors[action.payload.index] = action.payload.color;
     },
     // updateSize: (state, action) => {
     //   state.size = action.payload;

@@ -151,6 +151,7 @@ export const ColorPickerCanvas = () => {
           radius: 18,
           x: coord.x,
           y: coord.y,
+          index: index,
         });
       });
 
@@ -178,7 +179,6 @@ export const ColorPickerCanvas = () => {
             el.y - el.radius < e.offsetY &&
             e.offsetY < el.y + el.radius
           ) {
-            console.log(el.color, el.id);
             target = el;
           }
 
@@ -202,7 +202,9 @@ export const ColorPickerCanvas = () => {
             const pixel = ctx.getImageData(x, y, 1, 1);
             const data = pixel.data;
             const color = rgbToHex(data[0], data[1], data[2]);
-            dispatch(changeColor({ prev: target.color, next: color }));
+
+            dispatch(changeColor({ index: target.index, color: color }));
+
             target.color = color;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -226,8 +228,6 @@ export const ColorPickerCanvas = () => {
           canvas.addEventListener("mouseup", () => {
             canvas.removeEventListener("mousemove", onMouseMove);
           });
-
-          console.log(e.clientX);
         });
       });
 
