@@ -16,6 +16,10 @@ export const colorPickerSlice = createSlice({
     addColors: (state, action) => {
       state.colors = action.payload;
     },
+    changeColor: (state, action) => {
+      state.colors[state.colors.indexOf(action.payload.prev)] =
+        action.payload.next;
+    },
     // updateSize: (state, action) => {
     //   state.size = action.payload;
     // },
@@ -32,4 +36,4 @@ export const selectColors = (state: RootState) => {
 
 // export const selectSize = (state: RootState) => state.colorPicker.size;
 
-export const { addColors } = colorPickerSlice.actions;
+export const { addColors, changeColor } = colorPickerSlice.actions;

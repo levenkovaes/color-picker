@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   addColors,
+  changeColor,
   selectImg,
 } from "../../../store/features/color-picker/colorPickerSlice";
 // import image from "../../../assets/imgs/image1.jpg";
@@ -67,20 +68,6 @@ export const ColorPickerCanvas = () => {
 
       const colorsRgb = quantization([...rgbArr], 2);
       const filter = findBiggestColorRange(rgbArr) + "-filter";
-
-      console.log(rgbArr);
-      console.log(filter);
-
-      colorsRgb.forEach((color) => {
-        console.log(
-          rgbArr.findIndex((el) => {
-            if (el.r === color.r && el.g === color.g && el.b === color.b) {
-              return true;
-            }
-            return false;
-          })
-        );
-      });
 
       const colorsIndex = colorsRgb.map(({ r, g, b }) => {
         let index = rgbArr.findIndex((el) => {
@@ -147,10 +134,6 @@ export const ColorPickerCanvas = () => {
 
       const finalColorsRgb = colorsIndex.map((index) => rgbArr[index]);
 
-      console.log(colorsIndex);
-      console.log(finalColorsRgb);
-      console.log(Math.ceil((rgbArr.length - 1) / canvas.height), canvas.width);
-
       const colorsHex = finalColorsRgb.map(({ r, g, b }) => rgbToHex(r, g, b));
 
       const colorsCoords = colorsIndex.map((el) => {
@@ -160,17 +143,105 @@ export const ColorPickerCanvas = () => {
         };
       });
 
-      colorsCoords.forEach((el, index) => {
+      let circles: any = [];
+
+      colorsCoords.forEach((coord, index) => {
+        circles.push({
+          color: colorsHex[index],
+          radius: 18,
+          x: coord.x,
+          y: coord.y,
+        });
+      });
+
+      circles.forEach((el) => {
         ctx.beginPath();
-        ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
-        ctx.fillStyle = colorsHex[index];
+        ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = el.color;
         ctx.fill();
 
         ctx.beginPath();
-        ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
+        ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
         ctx.strokeStyle = "#ffffff";
         ctx.stroke();
       });
+
+      canvas.addEventListener("mousedown", (e: MouseEvent) => {
+        e.preventDefault();
+
+        let target;
+
+        circles.forEach((el) => {
+          if (
+            el.x - el.radius < e.offsetX &&
+            e.offsetX < el.x + el.radius &&
+            el.y - el.radius < e.offsetY &&
+            e.offsetY < el.y + el.radius
+          ) {
+            console.log(el.color, el.id);
+            target = el;
+          }
+
+          if (!target) return;
+
+          function moveAt(x, y) {
+            target.x = x;
+            target.y = y;
+          }
+
+          function onMouseMove(e: MouseEvent) {
+            const bounding = canvas.getBoundingClientRect();
+            const x = Math.floor(e.clientX - bounding.left);
+            const y = Math.floor(e.clientY - bounding.top);
+
+            moveAt(x, y);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+
+            const pixel = ctx.getImageData(x, y, 1, 1);
+            const data = pixel.data;
+            const color = rgbToHex(data[0], data[1], data[2]);
+            dispatch(changeColor({ prev: target.color, next: color }));
+            target.color = color;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+
+            circles.forEach((el) => {
+              ctx.beginPath();
+              ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+              ctx.fillStyle = el.color;
+              ctx.fill();
+
+              ctx.beginPath();
+              ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+              ctx.strokeStyle = "#ffffff";
+              ctx.stroke();
+            });
+          }
+
+          canvas.addEventListener("mousemove", onMouseMove);
+          canvas.addEventListener("mouseup", () => {
+            canvas.removeEventListener("mousemove", onMouseMove);
+          });
+
+          console.log(e.clientX);
+        });
+      });
+
+      // colorsCoords.forEach((el, index) => {
+      //   ctx.beginPath();
+      //   ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
+      //   ctx.fillStyle = colorsHex[index];
+      //   ctx.fill();
+
+      //   ctx.beginPath();
+      //   ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
+      //   ctx.strokeStyle = "#ffffff";
+      //   ctx.stroke();
+      // });
 
       // //random
       // const pixels = [];
