@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -18,12 +18,36 @@ export const ColorPickerCanvas = () => {
   const canvasRef = useRef(null);
   const dispatch = useDispatch();
 
+  const imgSrc = useSelector(selectImg);
+
   const { height, width } = useWindowDimensions();
 
-  const canvasWidth = (width * 70) / 100;
-  const canvasHeight = (height * 60) / 100;
+  const targetWidth =
+    window.innerHeight > window.innerWidth
+      ? (width * 80) / 100
+      : (width * 60) / 100;
+  const targetHeight = (height * 50) / 100;
 
-  const imgSrc = useSelector(selectImg);
+  const img = new Image();
+  // img.crossOrigin = "anonymous";
+  img.src = imgSrc;
+
+  const [canvasWidth, setCanvasWidth] = useState(0);
+  const [canvasHeight, setCanvasHeight] = useState(0);
+
+  img.addEventListener("load", () => {
+    setCanvasSize();
+  });
+
+  const setCanvasSize = () => {
+    if (img.height > targetHeight || img.width > targetWidth) {
+      setCanvasWidth(targetWidth);
+      setCanvasHeight((targetWidth / img.width) * img.height);
+    } else {
+      setCanvasWidth(img.width);
+      setCanvasHeight(img.height);
+    }
+  };
 
   useEffect(() => {
     const canvas: any = canvasRef.current;
@@ -34,45 +58,32 @@ export const ColorPickerCanvas = () => {
     const img = new Image();
     // img.crossOrigin = "anonymous";
     img.src = imgSrc;
-    let imgWidth = 0;
-    let imgHeight = 0;
 
     img.addEventListener("load", () => {
-      imgWidth = img.width;
-      imgHeight = img.height;
+      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
-      if (img.height > canvas.height || img.width > canvas.width) {
-        if (img.height > canvas.height) {
-          imgHeight = canvas.height;
-          imgWidth = (canvas.height / img.height) * img.width;
-        }
-
-        if (imgWidth > canvas.width) {
-          imgWidth = canvas.width;
-          imgHeight = (canvas.width / img.width) * img.height;
-        }
-        ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
-        // dispatch(updateSize({ width: imgWidth, height: imgHeight }));
-      } else {
-        ctx.drawImage(img, 0, 0);
-        // dispatch(updateSize({ width: img.width, height: img.height }));
-      }
-
-      const imgData = ctx.getImageData(0, 0, imgWidth, imgHeight).data;
-      const canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight).data;
-
-      const canvasRgbArr = buildRgb(canvasData);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
       const rgbArr = buildRgb(imgData);
 
-      // console.log(imgData);
-      // console.log(buildRgb(imgData));
-      //   console.log(quantization(buildRgb(imgData), 1));
-
-      const colorsRgb = quantization(rgbArr, 2);
+      const colorsRgb = quantization([...rgbArr], 2);
       const filter = findBiggestColorRange(rgbArr) + "-filter";
 
+      console.log(rgbArr);
+      console.log(filter);
+
+      colorsRgb.forEach((color) => {
+        console.log(
+          rgbArr.findIndex((el) => {
+            if (el.r === color.r && el.g === color.g && el.b === color.b) {
+              return true;
+            }
+            return false;
+          })
+        );
+      });
+
       const colorsIndex = colorsRgb.map(({ r, g, b }) => {
-        let index = canvasRgbArr.findIndex((el) => {
+        let index = rgbArr.findIndex((el) => {
           if (el.r === r && el.g === g && el.b === b) {
             return true;
           }
@@ -89,7 +100,7 @@ export const ColorPickerCanvas = () => {
 
           if (filtered2ColorsMatch.length > 0) {
             const newColor = filtered2ColorsMatch[0];
-            index = canvasRgbArr.findIndex((el) => {
+            index = rgbArr.findIndex((el) => {
               if (
                 el.r === newColor.r &&
                 el.g === newColor.g &&
@@ -118,7 +129,7 @@ export const ColorPickerCanvas = () => {
             );
 
             const newColor = filtered1ColorMatch[0];
-            index = canvasRgbArr.findIndex((el) => {
+            index = rgbArr.findIndex((el) => {
               if (
                 el.r === newColor.r &&
                 el.g === newColor.g &&
@@ -134,16 +145,18 @@ export const ColorPickerCanvas = () => {
         return index;
       });
 
-      const finalColorsRgb = colorsIndex.map((index) => canvasRgbArr[index]);
+      const finalColorsRgb = colorsIndex.map((index) => rgbArr[index]);
 
-      const colorsHex = finalColorsRgb.map((color) =>
-        rgbToHex(color.r, color.g, color.b)
-      );
+      console.log(colorsIndex);
+      console.log(finalColorsRgb);
+      console.log(Math.ceil((rgbArr.length - 1) / canvas.height), canvas.width);
 
-      const colorsCoords = colorsIndex.map((index) => {
+      const colorsHex = finalColorsRgb.map(({ r, g, b }) => rgbToHex(r, g, b));
+
+      const colorsCoords = colorsIndex.map((el) => {
         return {
-          x: index % canvasWidth,
-          y: Math.floor(index / canvasWidth),
+          x: el % canvas.width,
+          y: Math.ceil(el / canvas.width),
         };
       });
 
@@ -160,30 +173,39 @@ export const ColorPickerCanvas = () => {
       });
 
       // //random
-      //   const pixels = [];
+      // const pixels = [];
 
-      //   for (let i = 0; i < 8; ++i) {
-      //     const pixel = ctx.getImageData(
-      //       Math.floor(Math.random() * imgWidth),
-      //       Math.floor(Math.random() * imgHeight),
-      //       1,
-      //       1
-      //     );
-      //     const data = pixel.data;
+      // for (let i = 0; i < 8; ++i) {
+      //   const pixel = ctx.getImageData(
+      //     Math.floor(Math.random() * imgWidth),
+      //     Math.floor(Math.random() * imgHeight),
+      //     1,
+      //     1
+      //   );
+      //   const data = pixel.data;
 
-      //     pixels.push(rgbToHex(data[0], data[1], data[2]));
-      //   }
+      //   pixels.push(rgbToHex(data[0], data[1], data[2]));
+      // }
 
       dispatch(addColors(colorsHex));
     });
-  }, [canvasWidth, canvasHeight, width, height, imgSrc, dispatch]);
+  }, [
+    width,
+    height,
+    imgSrc,
+    dispatch,
+    targetHeight,
+    targetWidth,
+    canvasHeight,
+    canvasWidth,
+  ]);
 
   return (
     <SCanvas
       ref={canvasRef}
       alt="PlaygroundCanvas"
-      width={canvasWidth}
-      height={canvasHeight}
+      width={canvasWidth || targetWidth}
+      height={canvasHeight || targetHeight}
     ></SCanvas>
   );
 };
