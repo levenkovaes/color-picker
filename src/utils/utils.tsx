@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { IColor } from "../components/features/color-picker-canvas/types";
+
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
   return {
@@ -47,7 +49,7 @@ export const buildRgb = (imageData: Uint8ClampedArray) => {
   return rgbValues;
 };
 
-export const findBiggestColorRange = (rgbValues) => {
+export const findBiggestColorRange = (rgbValues: IColor[]) => {
   let rMin = Number.MAX_VALUE;
   let gMin = Number.MAX_VALUE;
   let bMin = Number.MAX_VALUE;
@@ -80,7 +82,7 @@ export const findBiggestColorRange = (rgbValues) => {
   }
 };
 
-export const quantization = (rgbValues, depth) => {
+export const quantization = (rgbValues: IColor[], depth: number): IColor[] => {
   // base code goes here
   const MAX_DEPTH = 4;
   if (depth === MAX_DEPTH || rgbValues.length === 0) {

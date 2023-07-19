@@ -1,27 +1,24 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import image from "../../../assets/imgs/image1.jpg";
+import image from "../../../assets/imgs/image2.jpg";
 import { RootState } from "../../store";
+import { IAddColorsAction, IChangeColorAction, IState } from "./types";
 
-const initialState = {
+const initialState: IState = {
   img: image,
   colors: [],
-  size: { width: 0, height: 0 },
 };
 
 export const colorPickerSlice = createSlice({
   name: "colorPicker",
   initialState,
   reducers: {
-    addColors: (state, action) => {
+    addColors: (state, action: PayloadAction<IAddColorsAction>) => {
       state.colors = action.payload;
     },
-    changeColor: (state, action) => {
+    changeColor: (state, action: PayloadAction<IChangeColorAction>) => {
       state.colors[action.payload.index] = action.payload.color;
     },
-    // updateSize: (state, action) => {
-    //   state.size = action.payload;
-    // },
   },
 });
 
@@ -32,7 +29,5 @@ export const selectImg = (state: RootState) => {
 export const selectColors = (state: RootState) => {
   return state.colorPicker.colors;
 };
-
-// export const selectSize = (state: RootState) => state.colorPicker.size;
 
 export const { addColors, changeColor } = colorPickerSlice.actions;

@@ -14,6 +14,7 @@ import useWindowDimensions, {
   rgbToHex,
 } from "../../../utils/utils";
 import { SCanvas } from "./styled";
+import { ICircle, IColor, ICoords } from "./types";
 
 export const ColorPickerCanvas = () => {
   const canvasRef = useRef(null);
@@ -23,11 +24,11 @@ export const ColorPickerCanvas = () => {
 
   const { height, width } = useWindowDimensions();
 
-  const targetWidth =
+  const targetWidth: number =
     window.innerHeight > window.innerWidth
       ? (width * 80) / 100
       : (width * 60) / 100;
-  const targetHeight = (height * 50) / 100;
+  const targetHeight: number = (height * 50) / 100;
 
   const img = new Image();
   // img.crossOrigin = "anonymous";
@@ -65,13 +66,18 @@ export const ColorPickerCanvas = () => {
     img.addEventListener("load", () => {
       ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      const rgbArr = buildRgb(imgData);
+      const imgData: Uint8ClampedArray = ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      ).data;
+      const rgbArr: IColor[] = buildRgb(imgData);
 
-      const colorsRgb = quantization([...rgbArr], 2);
-      const filter = findBiggestColorRange(rgbArr) + "-filter";
+      const colorsRgb: IColor[] = quantization([...rgbArr], 2);
+      const filter: string = findBiggestColorRange(rgbArr) + "-filter";
 
-      const colorsIndex = colorsRgb.map(({ r, g, b }) => {
+      const colorsIndex: number[] = colorsRgb.map(({ r, g, b }) => {
         let index = rgbArr.findIndex((el) => {
           if (el.r === r && el.g === g && el.b === b) {
             return true;
@@ -80,7 +86,7 @@ export const ColorPickerCanvas = () => {
         });
 
         if (index === -1) {
-          const filtered2ColorsMatch = rgbArr.filter(
+          const filtered2ColorsMatch: IColor[] = rgbArr.filter(
             ({ r: red, g: green, b: blue }) =>
               (red === r && green === g) ||
               (red === r && blue === b) ||
@@ -102,7 +108,7 @@ export const ColorPickerCanvas = () => {
           }
 
           if (filtered2ColorsMatch.length === 0) {
-            const filtered1ColorMatch = rgbArr.filter(
+            const filtered1ColorMatch: IColor[] = rgbArr.filter(
               ({ r: red, g: green, b: blue }) => {
                 switch (filter) {
                   case "r-filter":
@@ -117,7 +123,7 @@ export const ColorPickerCanvas = () => {
               }
             );
 
-            const newColor = filtered1ColorMatch[0];
+            const newColor: IColor = filtered1ColorMatch[0];
             index = rgbArr.findIndex((el) => {
               if (
                 el.r === newColor.r &&
@@ -134,18 +140,22 @@ export const ColorPickerCanvas = () => {
         return index;
       });
 
-      const finalColorsRgb = colorsIndex.map((index) => rgbArr[index]);
+      const finalColorsRgb: IColor[] = colorsIndex.map(
+        (index) => rgbArr[index]
+      );
 
-      const colorsHex = finalColorsRgb.map(({ r, g, b }) => rgbToHex(r, g, b));
+      const colorsHex: string[] = finalColorsRgb.map(({ r, g, b }) =>
+        rgbToHex(r, g, b)
+      );
 
-      const colorsCoords = colorsIndex.map((el) => {
+      const colorsCoords: ICoords = colorsIndex.map((el) => {
         return {
           x: el % canvas.width,
           y: Math.ceil(el / canvas.width),
         };
       });
 
-      let circles: any = [];
+      let circles: ICircle[] = [];
 
       colorsCoords.forEach((coord, index) => {
         circles.push({
@@ -172,7 +182,7 @@ export const ColorPickerCanvas = () => {
       canvas.addEventListener("mousedown", (e: MouseEvent) => {
         e.preventDefault();
 
-        let target;
+        let target: ICircle;
 
         circles.forEach((el) => {
           if (
@@ -186,7 +196,7 @@ export const ColorPickerCanvas = () => {
 
           if (!target) return;
 
-          function moveAt(x, y) {
+          function moveAt(x: number, y: number) {
             target.x = x;
             target.y = y;
           }
@@ -201,11 +211,11 @@ export const ColorPickerCanvas = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
-            const pixel = ctx.getImageData(x, y, 1, 1);
-            const data = pixel.data;
-            const color = rgbToHex(data[0], data[1], data[2]);
+            const pixel: ImageData = ctx.getImageData(x, y, 1, 1);
+            const data: Uint8ClampedArray = pixel.data;
+            const color: string = rgbToHex(data[0], data[1], data[2]);
 
-            console.log(target);
+            // console.log(target);
 
             dispatch(changeColor({ index: target.index, color: color }));
 
