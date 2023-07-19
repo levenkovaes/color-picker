@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: "./src/script/index.tsx",
+  entry: "./src/index.tsx",
   devtool: "inline-source-map",
   plugins: [
     new HtmlWebpackPlugin({
@@ -13,7 +13,7 @@ module.exports = {
       inject: "head",
       scriptLoading: "defer",
       filename: "index.html",
-      template: "./src/html/index.html",
+      template: "./src/index.html",
     }),
     new MiniCssExtractPlugin({
       filename: "[name].css",
@@ -41,6 +41,7 @@ module.exports = {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: "asset/resource",
       },
+      { test: /\\.(png|jp(e*)g|svg|gif)$/, use: ["file-loader"] },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: "asset/resource",

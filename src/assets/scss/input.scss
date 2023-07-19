@@ -1,0 +1,38 @@
+@import "./common/variables";
+@import "./common/normalizecss";
+@import "./common/toast";
+
+@font-face {
+  font-family: "Roboto";
+  src: url("../../assets/fonts/Roboto-Regular.ttf");
+}
+
+html {
+  font-family: "Roboto", sans-serif;
+  letter-spacing: 1px;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--light-grey);
+  color: var(--dark-green);
+  font-size: 18px;
+  padding: 50px;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+::selection {
+  background: var(--dark-green);
+  color: var(--light-grey);
+}
+::-moz-selection {
+  background: var(--dark-green);
+  color: var(--light-grey);
+}
