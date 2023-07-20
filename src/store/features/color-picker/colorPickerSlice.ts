@@ -19,6 +19,9 @@ export const colorPickerSlice = createSlice({
     changeColor: (state, action: PayloadAction<IChangeColorAction>) => {
       state.colors[action.payload.index] = action.payload.color;
     },
+    setImg: (state, action) => {
+      state.img = action.payload;
+    },
   },
 });
 
@@ -30,4 +33,4 @@ export const selectColors = (state: RootState) => {
   return state.colorPicker.colors;
 };
 
-export const { addColors, changeColor } = colorPickerSlice.actions;
+export const { addColors, changeColor, setImg } = colorPickerSlice.actions;

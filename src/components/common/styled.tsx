@@ -26,8 +26,46 @@ export const SH1 = styled.h1<{ $additionalCss?: FlattenSimpleInterpolation }>`
 `;
 
 export const SBtn = styled.button`
+  padding: 0;
+  background-color: transparent;
   border: none;
   :hover {
     cursor: pointer;
+  }
+`;
+
+export const SBtnTab = styled(SBtn)<{
+  $active?: boolean;
+}>`
+  color: var(--dark-green);
+  padding: 8px 20px 8px 0;
+  margin-right: 20px;
+
+  ${(props) => props.$active && `border-bottom: 1px solid var(--green)`};
+`;
+
+export const SGeneralBtn = styled(SBtn)<{
+  $additionalCss?: FlattenSimpleInterpolation;
+}>`
+  padding: 14px 30px;
+  color: var(--green);
+  background-color: transparent;
+  border: 1px solid var(--green);
+  border-radius: 5px;
+  display: block;
+  min-width: 180px;
+
+  ${(props) => props.$additionalCss}
+`;
+
+export const SInput = styled.input`
+  padding: 14px 8px;
+  border-radius: 5px;
+  border: none;
+
+  :focus,
+  :active {
+    outline: none;
+    border: 1px solid var(--dark-green);
   }
 `;

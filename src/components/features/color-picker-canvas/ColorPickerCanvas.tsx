@@ -31,7 +31,7 @@ export const ColorPickerCanvas = () => {
   const targetHeight: number = (height * 50) / 100;
 
   const img = new Image();
-  // img.crossOrigin = "anonymous";
+  img.crossOrigin = "anonymous";
   img.src = imgSrc;
 
   const [canvasWidth, setCanvasWidth] = useState(0);
@@ -42,9 +42,15 @@ export const ColorPickerCanvas = () => {
   });
 
   const setCanvasSize = () => {
-    if (img.height > targetHeight || img.width > targetWidth) {
+    if (img.width >= targetWidth && img.width >= img.height) {
       setCanvasWidth(targetWidth);
       setCanvasHeight((targetWidth / img.width) * img.height);
+      return;
+    }
+    if (img.height >= targetHeight && img.width < img.height) {
+      setCanvasHeight(targetHeight);
+      setCanvasWidth((targetHeight / img.height) * img.width);
+      return;
     } else {
       setCanvasWidth(img.width);
       setCanvasHeight(img.height);
@@ -60,7 +66,7 @@ export const ColorPickerCanvas = () => {
     });
 
     const img = new Image();
-    // img.crossOrigin = "anonymous";
+    img.crossOrigin = "anonymous";
     img.src = imgSrc;
 
     img.addEventListener("load", () => {
