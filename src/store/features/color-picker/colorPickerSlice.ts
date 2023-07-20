@@ -19,7 +19,7 @@ export const colorPickerSlice = createSlice({
     changeColor: (state, action: PayloadAction<IChangeColorAction>) => {
       state.colors[action.payload.index] = action.payload.color;
     },
-    setImg: (state, action) => {
+    setImg: (state, action: PayloadAction<string>) => {
       state.img = action.payload;
     },
   },

@@ -7,10 +7,13 @@ import { btnCss, SForm } from "./style";
 
 interface IFormValues {
   link: string;
+}
+
+interface ILinkFormProps {
   handleClose: () => void;
 }
 
-export const LinkForm = ({ handleClose }) => {
+export const LinkForm: React.FC<ILinkFormProps> = ({ handleClose }) => {
   const {
     register,
     handleSubmit,
