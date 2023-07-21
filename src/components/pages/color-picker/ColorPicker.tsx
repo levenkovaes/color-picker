@@ -1,21 +1,24 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { nanoid } from "@reduxjs/toolkit";
 
 import {
   selectColors,
   selectImg,
+  setImg,
 } from "../../../store/features/color-picker/colorPickerSlice";
 import { CloseBtn } from "../../common/close-btn/CloseBtn";
 import { Modal } from "../../common/modal/Modal";
 import { SBtnTab, SGeneralBtn, SH1 } from "../../common/styled";
 import { ColorBtn } from "../../features/color-btn/ColorBtn";
 import { ColorPickerCanvas } from "../../features/color-picker-canvas/ColorPickerCanvas";
+import { ImgDragAndDrop } from "../../features/img-drag-and-drop/ImgDragAndDrop";
 import { LinkForm } from "../../features/link-form/LinkForm";
 import { btnCss, modalCss } from "./styled";
 
 export const ColorPicker = () => {
+  const dispatch = useDispatch();
   const img = useSelector(selectImg);
   const colors = useSelector(selectColors);
   const [isModalDisplaying, setIsModalDisplaying] = useState(false);
@@ -23,6 +26,11 @@ export const ColorPicker = () => {
 
   const handleModalClick = () => {
     setIsModalDisplaying((prev) => !prev);
+  };
+
+  const onUpload = (file: File) => {
+    dispatch(setImg(file));
+    handleModalClick();
   };
 
   return (
@@ -67,9 +75,7 @@ export const ColorPicker = () => {
               }
               modalBody={
                 selectedTab === "file" ? (
-                  <p>
-                    Choose a file from your computer //Drag and Drop Your File
-                  </p>
+                  <ImgDragAndDrop onUpload={onUpload} />
                 ) : (
                   <LinkForm handleClose={handleModalClick} />
                 )

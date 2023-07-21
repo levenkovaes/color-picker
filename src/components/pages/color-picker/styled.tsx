@@ -5,5 +5,5 @@ export const btnCss = css`
 `;
 
 export const modalCss = css`
-  min-height: 200px;
+  min-height: 220px;
 `;

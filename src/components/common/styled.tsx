@@ -25,13 +25,17 @@ export const SH1 = styled.h1<{ $additionalCss?: FlattenSimpleInterpolation }>`
   ${(props) => props.$additionalCss}
 `;
 
-export const SBtn = styled.button`
+export const SBtn = styled.button<{
+  $additionalCss?: FlattenSimpleInterpolation;
+}>`
   padding: 0;
   background-color: transparent;
   border: none;
   :hover {
     cursor: pointer;
   }
+
+  ${(props) => props.$additionalCss}
 `;
 
 export const SBtnTab = styled(SBtn)<{
@@ -67,5 +71,9 @@ export const SInput = styled.input`
   :active {
     outline: none;
     border: 1px solid var(--dark-green);
+  }
+
+  ::placeholder {
+    color: var(--grey);
   }
 `;

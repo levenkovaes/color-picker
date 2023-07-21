@@ -6,7 +6,6 @@ import {
   changeColor,
   selectImg,
 } from "../../../store/features/color-picker/colorPickerSlice";
-// import image from "../../../assets/imgs/image1.jpg";
 import useWindowDimensions, {
   buildRgb,
   findBiggestColorRange,
@@ -32,7 +31,18 @@ export const ColorPickerCanvas = () => {
 
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = imgSrc;
+
+  if (typeof imgSrc === "string") {
+    img.src = imgSrc;
+  } else {
+    let reader = new FileReader();
+
+    reader.readAsDataURL(imgSrc);
+
+    reader.onload = function () {
+      img.src = reader.result as string;
+    };
+  }
 
   const [canvasWidth, setCanvasWidth] = useState(0);
   const [canvasHeight, setCanvasHeight] = useState(0);
@@ -67,8 +77,18 @@ export const ColorPickerCanvas = () => {
 
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = imgSrc;
 
+    if (typeof imgSrc === "string") {
+      img.src = imgSrc;
+    } else {
+      let reader = new FileReader();
+
+      reader.readAsDataURL(imgSrc);
+
+      reader.onload = function () {
+        img.src = reader.result as string;
+      };
+    }
     img.addEventListener("load", () => {
       ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
@@ -250,18 +270,6 @@ export const ColorPickerCanvas = () => {
           });
         });
       });
-
-      // colorsCoords.forEach((el, index) => {
-      //   ctx.beginPath();
-      //   ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
-      //   ctx.fillStyle = colorsHex[index];
-      //   ctx.fill();
-
-      //   ctx.beginPath();
-      //   ctx.arc(el.x, el.y, 18, 0, 2 * Math.PI);
-      //   ctx.strokeStyle = "#ffffff";
-      //   ctx.stroke();
-      // });
 
       // //random
       // const pixels = [];

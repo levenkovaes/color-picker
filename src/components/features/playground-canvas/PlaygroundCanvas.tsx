@@ -9,8 +9,6 @@ export const PlaygroundCanvas = () => {
   const { height, width } = useWindowDimensions();
   const canvasWidth = width;
   const canvasHeight = height;
-  // const canvasWidth = (width * 70) / 100;
-  // const canvasHeight = (height * 70) / 100;
 
   useEffect(() => {
     const colors = [
@@ -82,44 +80,7 @@ export const PlaygroundCanvas = () => {
       });
 
       window.requestAnimationFrame(draw);
-
-      // ctx.fill(circle);
-
-      // ctx.beginPath();
-      // ctx.arc(
-      //   Math.floor(Math.random() * canvasWidth),
-      //   Math.floor(Math.random() * canvasHeight),
-      //   Math.floor(Math.random() * (70 - 10 + 1) + 10),
-      //   0,
-      //   Math.PI * 2,
-      //   false
-      // );
-      // ctx.fill();
-
-      // ctx.rotate(
-      //   ((2 * Math.PI) / 6) * new Date().getSeconds() +
-      //     ((2 * Math.PI) / 6000) * new Date().getMilliseconds()
-      // );
-
-      // for (let i = 0; i <= Math.floor(Math.random() * (15 - 5 + 1) + 5); i++) {
-      //   ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-
-      //   ctx.beginPath();
-      //   ctx.arc(
-      //     Math.floor(Math.random() * canvasWidth),
-      //     Math.floor(Math.random() * canvasHeight),
-      //     Math.floor(Math.random() * (70 - 10 + 1) + 10),
-      //     0,
-      //     Math.PI * 2,
-      //     false
-      //   );
-      //   ctx.fill();
-      // }
-
-      // window.requestAnimationFrame(draw);
     };
-
-    // draw();
 
     window.requestAnimationFrame(draw);
   }, [width, height, canvasWidth, canvasHeight]);

@@ -1,5 +1,5 @@
 export interface IState {
-  img: string;
+  img: string | File;
   colors: [] | string[];
 }
 

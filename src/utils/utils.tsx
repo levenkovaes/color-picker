@@ -83,7 +83,6 @@ export const findBiggestColorRange = (rgbValues: IColor[]) => {
 };
 
 export const quantization = (rgbValues: IColor[], depth: number): IColor[] => {
-  // base code goes here
   const MAX_DEPTH = 4;
   if (depth === MAX_DEPTH || rgbValues.length === 0) {
     const color = rgbValues.reduce(
