@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 
-export const SDropArea = styled.div`
+export const SDropArea = styled.div<{ $isDragging: boolean }>`
   width: 100%;
   height: 100%;
   padding: 50px;
@@ -9,8 +9,12 @@ export const SDropArea = styled.div`
   justify-content: center;
   flex-flow: column nowrap;
   color: var(--grey);
-  border: 1px var(--grey) dashed;
+  border: 1px dashed
+    ${(props) => (props.$isDragging ? "var(--purple)" : "var(--grey)")};
   border-radius: 5px;
+
+  background-color: ${(props) =>
+    props.$isDragging ? "var(--light-purple)" : "transparent"};
 `;
 
 export const btnCss = css`

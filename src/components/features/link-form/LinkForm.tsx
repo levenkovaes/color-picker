@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 
 import { setImg } from "../../../store/features/color-picker/colorPickerSlice";
-import { SGeneralBtn, SInput } from "../../common/styled";
+import { SError, SGeneralBtn, SInput } from "../../common/styled";
 import { btnCss, SForm } from "./style";
 
 interface IFormValues {
@@ -29,13 +29,23 @@ export const LinkForm: React.FC<ILinkFormProps> = ({ handleClose }) => {
       })}
     >
       <SInput
-        {...register("link", { required: true })}
+        $error={!!errors.link}
+        {...register("link", {
+          required: true,
+          pattern: {
+            value:
+              /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+            message:
+              "Link does not work. Make sure it starts with http:// or https:// and try again.",
+          },
+        })}
         type="text"
         placeholder="Paste your link here"
       ></SInput>
       <SGeneralBtn type="submit" $additionalCss={btnCss}>
         Upload
       </SGeneralBtn>
+      {errors.link && <SError>{errors.link?.message}</SError>}
     </SForm>
   );
 };

@@ -62,18 +62,26 @@ export const SGeneralBtn = styled(SBtn)<{
   ${(props) => props.$additionalCss}
 `;
 
-export const SInput = styled.input`
+export const SInput = styled.input<{ $error?: boolean }>`
   padding: 14px 8px;
   border-radius: 5px;
-  border: none;
+  outline: none;
+  border: ${(props) => (props.$error ? "solid 1px var(--red)" : "none")};
 
   :focus,
   :active {
     outline: none;
-    border: 1px solid var(--dark-green);
+    border: solid 1px
+      ${(props) => (props.$error ? "var(--red)" : "var(--dark-green)")};
   }
 
   ::placeholder {
     color: var(--grey);
   }
+`;
+
+export const SError = styled.p`
+  color: var(--red);
+  font-size: smaller;
+  padding-top: 6px;
 `;
