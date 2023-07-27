@@ -38,12 +38,6 @@ export const ImgDragAndDrop: React.FC<IImgDragAndDropProps> = ({
           file.type.startsWith("image")
         );
 
-        let errorMessage = null;
-
-        if (firstImgIndex !== 0) {
-          errorMessage = "Only an image can be uploaded";
-        }
-
         if (firstImgIndex === -1) {
           toast.error("No image has been selected", {
             progress: undefined,
@@ -52,9 +46,14 @@ export const ImgDragAndDrop: React.FC<IImgDragAndDropProps> = ({
         }
 
         if (files.length > 1) {
-          toast.error(errorMessage || "Only one image can be uploaded", {
-            progress: undefined,
-          });
+          toast.error(
+            Array.from(files).some((file) => !file.type.startsWith("image"))
+              ? "Only an image can be uploaded"
+              : "Only one image can be uploaded",
+            {
+              progress: undefined,
+            }
+          );
           toast.success("First image has been uploaded", {
             progress: undefined,
           });
