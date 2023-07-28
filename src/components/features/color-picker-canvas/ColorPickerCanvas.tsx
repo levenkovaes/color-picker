@@ -15,9 +15,11 @@ import useWindowDimensions, {
 import { SCanvas } from "./styled";
 import { ICircle, IColor, ICoords } from "./types";
 
-export const ColorPickerCanvas = () => {
+export const ColorPickerCanvas: React.FC = () => {
   const canvasRef = useRef(null);
   const dispatch = useDispatch();
+
+  console.log("first");
 
   const imgSrc = useSelector(selectImg);
 
@@ -75,10 +77,13 @@ export const ColorPickerCanvas = () => {
       willReadFrequently: true,
     });
 
+    // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
     const img = new Image();
     img.crossOrigin = "anonymous";
 
     if (typeof imgSrc === "string") {
+      // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       img.src = imgSrc;
     } else {
       let reader = new FileReader();
@@ -86,10 +91,13 @@ export const ColorPickerCanvas = () => {
       reader.readAsDataURL(imgSrc);
 
       reader.onload = function () {
+        // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         img.src = reader.result as string;
       };
     }
+
     img.addEventListener("load", () => {
+      // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
       const imgData: Uint8ClampedArray = ctx.getImageData(
@@ -181,6 +189,10 @@ export const ColorPickerCanvas = () => {
         };
       });
 
+      // console.log(colorsHex);
+      // console.log(colorsIndex);
+      // console.log(colorsCoords);
+
       let circles: ICircle[] = [];
 
       colorsCoords.forEach((coord, index) => {
@@ -205,22 +217,31 @@ export const ColorPickerCanvas = () => {
         ctx.stroke();
       });
 
-      canvas.addEventListener("mousedown", (e: MouseEvent) => {
+      const handleMouseDown = (e: MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
 
-        let target: ICircle;
+        // console.log(e);
+
+        const bounding = canvas.getBoundingClientRect();
+        const x = Math.floor(e.clientX - bounding.left);
+        const y = Math.floor(e.clientY - bounding.top);
+
+        let target: ICircle | null = null;
 
         circles.forEach((el) => {
           if (
-            el.x - el.radius < e.offsetX &&
-            e.offsetX < el.x + el.radius &&
-            el.y - el.radius < e.offsetY &&
-            e.offsetY < el.y + el.radius
+            el.x - el.radius < x &&
+            x < el.x + el.radius &&
+            el.y - el.radius < e.y &&
+            y < el.y + el.radius
           ) {
-            target = el;
+            target = structuredClone(el);
           }
 
-          if (!target) return;
+          if (!target) {
+            return;
+          }
 
           function moveAt(x: number, y: number) {
             target.x = x;
@@ -228,6 +249,9 @@ export const ColorPickerCanvas = () => {
           }
 
           function onMouseMove(e: MouseEvent) {
+            // console.log(e);
+            e.stopPropagation();
+
             const bounding = canvas.getBoundingClientRect();
             const x = Math.floor(e.clientX - bounding.left);
             const y = Math.floor(e.clientY - bounding.top);
@@ -243,13 +267,19 @@ export const ColorPickerCanvas = () => {
 
             // console.log(target);
 
-            dispatch(changeColor({ index: target.index, color: color }));
-
             target.color = color;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+
+            circles = [...circles].map((el) => {
+              if (el.index === target?.index) {
+                dispatch(changeColor({ index: target.index, color: color }));
+                return structuredClone(target);
+              }
+              return structuredClone(el);
+            });
 
             circles.forEach((el) => {
               ctx.beginPath();
@@ -264,12 +294,20 @@ export const ColorPickerCanvas = () => {
             });
           }
 
-          canvas.addEventListener("mousemove", onMouseMove);
-          canvas.addEventListener("mouseup", () => {
+          const handleMouseUp = (e: MouseEvent) => {
+            e.stopPropagation();
+            // console.log(e);
+
             canvas.removeEventListener("mousemove", onMouseMove);
-          });
+            canvas.removeEventListener("mouseup", handleMouseUp);
+          };
+
+          canvas.addEventListener("mousemove", onMouseMove);
+          canvas.addEventListener("mouseup", handleMouseUp);
         });
-      });
+      };
+
+      canvas.addEventListener("mousedown", handleMouseDown);
 
       // //random
       // const pixels = [];
@@ -290,12 +328,16 @@ export const ColorPickerCanvas = () => {
     });
   }, [imgSrc, dispatch, targetHeight, targetWidth, canvasHeight, canvasWidth]);
 
+  if (!canvasWidth || !canvasHeight) {
+    return null;
+  }
+
   return (
     <SCanvas
       ref={canvasRef}
       alt="PlaygroundCanvas"
-      width={canvasWidth || targetWidth}
-      height={canvasHeight || targetHeight}
+      width={canvasWidth}
+      height={canvasHeight}
     ></SCanvas>
   );
 };
