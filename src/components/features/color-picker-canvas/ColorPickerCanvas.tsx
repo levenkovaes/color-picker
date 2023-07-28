@@ -54,12 +54,12 @@ export const ColorPickerCanvas: React.FC = () => {
   });
 
   const setCanvasSize = () => {
-    if (img.width >= targetWidth && img.width >= img.height) {
+    if (img.width >= targetWidth && img.width > img.height) {
       setCanvasWidth(targetWidth);
       setCanvasHeight((targetWidth / img.width) * img.height);
       return;
     }
-    if (img.height >= targetHeight && img.width < img.height) {
+    if (img.height >= targetHeight && img.width <= img.height) {
       setCanvasHeight(targetHeight);
       setCanvasWidth((targetHeight / img.height) * img.width);
       return;
