@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -18,12 +18,11 @@ import { ICircle, IColor, ICoords } from "./types";
 export const ColorPickerCanvas: React.FC = () => {
   const canvasRef = useRef(null);
   const dispatch = useDispatch();
-
-  console.log("first");
-
   const imgSrc = useSelector(selectImg);
-
   const { height, width } = useWindowDimensions();
+
+  const [canvasWidth, setCanvasWidth] = useState(0);
+  const [canvasHeight, setCanvasHeight] = useState(0);
 
   const targetWidth: number =
     window.innerHeight > window.innerWidth
@@ -31,23 +30,23 @@ export const ColorPickerCanvas: React.FC = () => {
       : (width * 60) / 100;
   const targetHeight: number = (height * 50) / 100;
 
-  const img = new Image();
-  img.crossOrigin = "anonymous";
+  const img = useMemo(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
 
-  if (typeof imgSrc === "string") {
-    img.src = imgSrc;
-  } else {
-    let reader = new FileReader();
+    if (typeof imgSrc === "string") {
+      img.src = imgSrc;
+    } else {
+      let reader = new FileReader();
 
-    reader.readAsDataURL(imgSrc);
+      reader.readAsDataURL(imgSrc);
 
-    reader.onload = function () {
-      img.src = reader.result as string;
-    };
-  }
-
-  const [canvasWidth, setCanvasWidth] = useState(0);
-  const [canvasHeight, setCanvasHeight] = useState(0);
+      reader.onload = function () {
+        img.src = reader.result as string;
+      };
+    }
+    return img;
+  }, [imgSrc]);
 
   img.addEventListener("load", () => {
     setCanvasSize();
@@ -69,268 +68,244 @@ export const ColorPickerCanvas: React.FC = () => {
     }
   };
 
+  // const canvas: HTMLCanvasElement | null = canvasRef.current;
+  // console.log(canvas);
+
   useEffect(() => {
     if (!canvasWidth || !canvasHeight) return;
 
     const canvas: any = canvasRef.current;
+
+    if (!canvas) return;
+
     const ctx: CanvasRenderingContext2D = canvas.getContext("2d", {
       willReadFrequently: true,
     });
 
-    // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
-    const img = new Image();
-    img.crossOrigin = "anonymous";
+    const imgData: Uint8ClampedArray = ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    ).data;
+    const rgbArr: IColor[] = buildRgb(imgData);
 
-    if (typeof imgSrc === "string") {
-      // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      img.src = imgSrc;
-    } else {
-      let reader = new FileReader();
+    const colorsRgb: IColor[] = quantization([...rgbArr], 2);
+    const filter: string = findBiggestColorRange(rgbArr) + "-filter";
 
-      reader.readAsDataURL(imgSrc);
+    const colorsIndex: number[] = colorsRgb.map(({ r, g, b }) => {
+      let index = rgbArr.findIndex((el) => {
+        if (el.r === r && el.g === g && el.b === b) {
+          return true;
+        }
+        return false;
+      });
 
-      reader.onload = function () {
-        // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-        img.src = reader.result as string;
-      };
-    }
+      if (index === -1) {
+        const filtered2ColorsMatch: IColor[] = rgbArr.filter(
+          ({ r: red, g: green, b: blue }) =>
+            (red === r && green === g) ||
+            (red === r && blue === b) ||
+            (green === g && blue === b)
+        );
 
-    img.addEventListener("load", () => {
-      // ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-
-      const imgData: Uint8ClampedArray = ctx.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      ).data;
-      const rgbArr: IColor[] = buildRgb(imgData);
-
-      const colorsRgb: IColor[] = quantization([...rgbArr], 2);
-      const filter: string = findBiggestColorRange(rgbArr) + "-filter";
-
-      const colorsIndex: number[] = colorsRgb.map(({ r, g, b }) => {
-        let index = rgbArr.findIndex((el) => {
-          if (el.r === r && el.g === g && el.b === b) {
-            return true;
-          }
-          return false;
-        });
-
-        if (index === -1) {
-          const filtered2ColorsMatch: IColor[] = rgbArr.filter(
-            ({ r: red, g: green, b: blue }) =>
-              (red === r && green === g) ||
-              (red === r && blue === b) ||
-              (green === g && blue === b)
-          );
-
-          if (filtered2ColorsMatch.length > 0) {
-            const newColor = filtered2ColorsMatch[0];
-            index = rgbArr.findIndex((el) => {
-              if (
-                el.r === newColor.r &&
-                el.g === newColor.g &&
-                el.b === newColor.b
-              ) {
-                return true;
-              }
-              return false;
-            });
-          }
-
-          if (filtered2ColorsMatch.length === 0) {
-            const filtered1ColorMatch: IColor[] = rgbArr.filter(
-              ({ r: red, g: green, b: blue }) => {
-                switch (filter) {
-                  case "r-filter":
-                    return red === r;
-                  case "g-filter":
-                    return green === g;
-                  case "b-filter":
-                    return blue === b;
-                  default:
-                    return red === r;
-                }
-              }
-            );
-
-            const newColor: IColor = filtered1ColorMatch[0];
-            index = rgbArr.findIndex((el) => {
-              if (
-                el.r === newColor.r &&
-                el.g === newColor.g &&
-                el.b === newColor.b
-              ) {
-                return true;
-              }
-              return false;
-            });
-          }
+        if (filtered2ColorsMatch.length > 0) {
+          const newColor = filtered2ColorsMatch[0];
+          index = rgbArr.findIndex((el) => {
+            if (
+              el.r === newColor.r &&
+              el.g === newColor.g &&
+              el.b === newColor.b
+            ) {
+              return true;
+            }
+            return false;
+          });
         }
 
-        return index;
+        if (filtered2ColorsMatch.length === 0) {
+          const filtered1ColorMatch: IColor[] = rgbArr.filter(
+            ({ r: red, g: green, b: blue }) => {
+              switch (filter) {
+                case "r-filter":
+                  return red === r;
+                case "g-filter":
+                  return green === g;
+                case "b-filter":
+                  return blue === b;
+                default:
+                  return red === r;
+              }
+            }
+          );
+
+          const newColor: IColor = filtered1ColorMatch[0];
+          index = rgbArr.findIndex((el) => {
+            if (
+              el.r === newColor.r &&
+              el.g === newColor.g &&
+              el.b === newColor.b
+            ) {
+              return true;
+            }
+            return false;
+          });
+        }
+      }
+
+      return index;
+    });
+
+    const finalColorsRgb: IColor[] = colorsIndex.map((index) => rgbArr[index]);
+
+    const colorsHex: string[] = finalColorsRgb.map(({ r, g, b }) =>
+      rgbToHex(r, g, b)
+    );
+
+    const colorsCoords: ICoords = colorsIndex.map((el) => {
+      return {
+        x: el % canvas.width,
+        y: Math.ceil(el / canvas.width),
+      };
+    });
+
+    let circles: ICircle[] = [];
+
+    colorsCoords.forEach((coord, index) => {
+      circles.push({
+        color: colorsHex[index],
+        radius: 18,
+        x: coord.x,
+        y: coord.y,
+        index: index,
       });
+    });
 
-      const finalColorsRgb: IColor[] = colorsIndex.map(
-        (index) => rgbArr[index]
-      );
+    circles.forEach((el) => {
+      ctx.beginPath();
+      ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = el.color;
+      ctx.fill();
 
-      const colorsHex: string[] = finalColorsRgb.map(({ r, g, b }) =>
-        rgbToHex(r, g, b)
-      );
+      ctx.beginPath();
+      ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#ffffff";
+      ctx.stroke();
+    });
 
-      const colorsCoords: ICoords = colorsIndex.map((el) => {
-        return {
-          x: el % canvas.width,
-          y: Math.ceil(el / canvas.width),
-        };
-      });
+    const handleMouseDown = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-      // console.log(colorsHex);
-      // console.log(colorsIndex);
-      // console.log(colorsCoords);
+      // console.log(e);
 
-      let circles: ICircle[] = [];
+      const bounding = canvas.getBoundingClientRect();
+      const x = Math.floor(e.clientX - bounding.left);
+      const y = Math.floor(e.clientY - bounding.top);
 
-      colorsCoords.forEach((coord, index) => {
-        circles.push({
-          color: colorsHex[index],
-          radius: 18,
-          x: coord.x,
-          y: coord.y,
-          index: index,
-        });
-      });
+      let target: ICircle | null = null;
 
       circles.forEach((el) => {
-        ctx.beginPath();
-        ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = el.color;
-        ctx.fill();
+        if (
+          el.x - el.radius < x &&
+          x < el.x + el.radius &&
+          el.y - el.radius < e.y &&
+          y < el.y + el.radius
+        ) {
+          target = structuredClone(el);
+        }
 
-        ctx.beginPath();
-        ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = "#ffffff";
-        ctx.stroke();
+        if (!target) {
+          return;
+        }
+
+        function moveAt(x: number, y: number) {
+          target.x = x;
+          target.y = y;
+        }
+
+        function onMouseMove(e: MouseEvent) {
+          // console.log(e);
+          e.stopPropagation();
+
+          const bounding = canvas.getBoundingClientRect();
+          const x = Math.floor(e.clientX - bounding.left);
+          const y = Math.floor(e.clientY - bounding.top);
+
+          moveAt(x, y);
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+
+          const pixel: ImageData = ctx.getImageData(x, y, 1, 1);
+          const data: Uint8ClampedArray = pixel.data;
+          const color: string = rgbToHex(data[0], data[1], data[2]);
+
+          // console.log(target);
+
+          target.color = color;
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+
+          circles = [...circles].map((el) => {
+            if (el.index === target?.index) {
+              dispatch(changeColor({ index: target.index, color: color }));
+              return structuredClone(target);
+            }
+            return structuredClone(el);
+          });
+
+          circles.forEach((el) => {
+            ctx.beginPath();
+            ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+            ctx.fillStyle = el.color;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+          });
+        }
+
+        const handleMouseUp = (e: MouseEvent) => {
+          e.stopPropagation();
+          // console.log(e);
+
+          canvas.removeEventListener("mousemove", onMouseMove);
+          canvas.removeEventListener("mouseup", handleMouseUp);
+        };
+
+        canvas.addEventListener("mousemove", onMouseMove);
+        canvas.addEventListener("mouseup", handleMouseUp);
       });
+    };
 
-      const handleMouseDown = (e: MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    canvas.addEventListener("mousedown", handleMouseDown);
 
-        // console.log(e);
+    // //random
+    // const pixels = [];
 
-        const bounding = canvas.getBoundingClientRect();
-        const x = Math.floor(e.clientX - bounding.left);
-        const y = Math.floor(e.clientY - bounding.top);
+    // for (let i = 0; i < 8; ++i) {
+    //   const pixel = ctx.getImageData(
+    //     Math.floor(Math.random() * imgWidth),
+    //     Math.floor(Math.random() * imgHeight),
+    //     1,
+    //     1
+    //   );
+    //   const data = pixel.data;
 
-        let target: ICircle | null = null;
+    //   pixels.push(rgbToHex(data[0], data[1], data[2]));
+    // }
 
-        circles.forEach((el) => {
-          if (
-            el.x - el.radius < x &&
-            x < el.x + el.radius &&
-            el.y - el.radius < e.y &&
-            y < el.y + el.radius
-          ) {
-            target = structuredClone(el);
-          }
+    dispatch(addColors(colorsHex));
+  }, [dispatch, canvasHeight, canvasWidth]);
 
-          if (!target) {
-            return;
-          }
-
-          function moveAt(x: number, y: number) {
-            target.x = x;
-            target.y = y;
-          }
-
-          function onMouseMove(e: MouseEvent) {
-            // console.log(e);
-            e.stopPropagation();
-
-            const bounding = canvas.getBoundingClientRect();
-            const x = Math.floor(e.clientX - bounding.left);
-            const y = Math.floor(e.clientY - bounding.top);
-
-            moveAt(x, y);
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-
-            const pixel: ImageData = ctx.getImageData(x, y, 1, 1);
-            const data: Uint8ClampedArray = pixel.data;
-            const color: string = rgbToHex(data[0], data[1], data[2]);
-
-            // console.log(target);
-
-            target.color = color;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-
-            circles = [...circles].map((el) => {
-              if (el.index === target?.index) {
-                dispatch(changeColor({ index: target.index, color: color }));
-                return structuredClone(target);
-              }
-              return structuredClone(el);
-            });
-
-            circles.forEach((el) => {
-              ctx.beginPath();
-              ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
-              ctx.fillStyle = el.color;
-              ctx.fill();
-
-              ctx.beginPath();
-              ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
-              ctx.strokeStyle = "#ffffff";
-              ctx.stroke();
-            });
-          }
-
-          const handleMouseUp = (e: MouseEvent) => {
-            e.stopPropagation();
-            // console.log(e);
-
-            canvas.removeEventListener("mousemove", onMouseMove);
-            canvas.removeEventListener("mouseup", handleMouseUp);
-          };
-
-          canvas.addEventListener("mousemove", onMouseMove);
-          canvas.addEventListener("mouseup", handleMouseUp);
-        });
-      };
-
-      canvas.addEventListener("mousedown", handleMouseDown);
-
-      // //random
-      // const pixels = [];
-
-      // for (let i = 0; i < 8; ++i) {
-      //   const pixel = ctx.getImageData(
-      //     Math.floor(Math.random() * imgWidth),
-      //     Math.floor(Math.random() * imgHeight),
-      //     1,
-      //     1
-      //   );
-      //   const data = pixel.data;
-
-      //   pixels.push(rgbToHex(data[0], data[1], data[2]));
-      // }
-
-      dispatch(addColors(colorsHex));
-    });
-  }, [imgSrc, dispatch, targetHeight, targetWidth, canvasHeight, canvasWidth]);
-
-  if (!canvasWidth || !canvasHeight) {
-    return null;
-  }
+  if (!canvasWidth || !canvasHeight) return;
 
   return (
     <SCanvas
