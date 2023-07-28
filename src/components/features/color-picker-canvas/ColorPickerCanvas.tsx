@@ -68,9 +68,6 @@ export const ColorPickerCanvas: React.FC = () => {
     }
   };
 
-  // const canvas: HTMLCanvasElement | null = canvasRef.current;
-  // console.log(canvas);
-
   useEffect(() => {
     if (!canvasWidth) return;
 
@@ -199,13 +196,11 @@ export const ColorPickerCanvas: React.FC = () => {
       e.preventDefault();
       e.stopPropagation();
 
-      // console.log(e);
-
       const bounding = canvas.getBoundingClientRect();
       const x = Math.floor(e.clientX - bounding.left);
       const y = Math.floor(e.clientY - bounding.top);
 
-      let target: ICircle | null = null;
+      let target: any = null;
 
       circles.forEach((el) => {
         if (
@@ -227,7 +222,6 @@ export const ColorPickerCanvas: React.FC = () => {
         }
 
         function onMouseMove(e: MouseEvent) {
-          // console.log(e);
           e.stopPropagation();
 
           const bounding = canvas.getBoundingClientRect();
@@ -243,20 +237,14 @@ export const ColorPickerCanvas: React.FC = () => {
           const data: Uint8ClampedArray = pixel.data;
           const color: string = rgbToHex(data[0], data[1], data[2]);
 
-          // console.log(target);
-
           target.color = color;
-
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
           circles = [...circles].map((el) => {
             if (el.index === target?.index) {
               dispatch(changeColor({ index: target.index, color: color }));
-              return structuredClone(target);
+              return target;
             }
-            return structuredClone(el);
+            return el;
           });
 
           circles.forEach((el) => {
@@ -274,7 +262,6 @@ export const ColorPickerCanvas: React.FC = () => {
 
         const handleMouseUp = (e: MouseEvent) => {
           e.stopPropagation();
-          // console.log(e);
 
           canvas.removeEventListener("mousemove", onMouseMove);
           canvas.removeEventListener("mouseup", handleMouseUp);
