@@ -1,5 +1,6 @@
 import styled from "styled-components";
 
+import { checkDarkColor } from "../../../utils/utils";
 import { SBtn } from "../../common/styled";
 
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -7,11 +8,14 @@ interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button: React.FC<IButtonProps> = styled(SBtn).attrs<IButtonProps>(
-  (props) => ({
-    style: {
-      background: props.$bgColor,
-    },
-  })
+  (props) => {
+    return {
+      style: {
+        background: props.$bgColor,
+        color: checkDarkColor(props.$bgColor) ? "#ffffff" : "#000000",
+      },
+    };
+  }
 )`
   padding: 20px;
   min-width: 120px;

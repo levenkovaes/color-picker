@@ -8,6 +8,7 @@ import {
 } from "../../../store/features/color-picker/colorPickerSlice";
 import useWindowDimensions, {
   buildRgb,
+  checkDarkColor,
   findBiggestColorRange,
   quantization,
   rgbToHex,
@@ -188,7 +189,7 @@ export const ColorPickerCanvas: React.FC = () => {
 
       ctx.beginPath();
       ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
-      ctx.strokeStyle = "#ffffff";
+      ctx.strokeStyle = checkDarkColor(el.color, 230) ? "#ffffff" : "#aaaaaa";
       ctx.stroke();
     });
 
@@ -255,7 +256,9 @@ export const ColorPickerCanvas: React.FC = () => {
 
             ctx.beginPath();
             ctx.arc(el.x, el.y, el.radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = "#ffffff";
+            ctx.strokeStyle = checkDarkColor(el.color, 230)
+              ? "#ffffff"
+              : "#aaaaaa";
             ctx.stroke();
           });
         }
