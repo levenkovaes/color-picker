@@ -72,7 +72,7 @@ export const ColorPickerCanvas: React.FC = () => {
   // console.log(canvas);
 
   useEffect(() => {
-    if (!canvasWidth || !canvasHeight) return;
+    if (!canvasWidth) return;
 
     const canvas: any = canvasRef.current;
 
@@ -287,6 +287,12 @@ export const ColorPickerCanvas: React.FC = () => {
 
     canvas.addEventListener("mousedown", handleMouseDown);
 
+    dispatch(addColors(colorsHex));
+
+    return () => {
+      canvas.removeEventListener("mousedown", handleMouseDown);
+    };
+
     // //random
     // const pixels = [];
 
@@ -301,11 +307,9 @@ export const ColorPickerCanvas: React.FC = () => {
 
     //   pixels.push(rgbToHex(data[0], data[1], data[2]));
     // }
-
-    dispatch(addColors(colorsHex));
   }, [dispatch, canvasHeight, canvasWidth]);
 
-  if (!canvasWidth || !canvasHeight) return;
+  if (!canvasWidth) return;
 
   return (
     <SCanvas
