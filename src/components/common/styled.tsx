@@ -8,7 +8,6 @@ export const SLink = styled(Link)`
   padding: 2px 0;
   margin: 4px 0 0;
   transition: color 0.2s;
-  /* background-color: var(--black); */
 
   :visited {
     color: var(--dark-green);
@@ -31,6 +30,7 @@ export const SBtn = styled.button<{
   padding: 0;
   background-color: transparent;
   border: none;
+
   :hover {
     cursor: pointer;
   }

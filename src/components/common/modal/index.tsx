@@ -1,6 +1,3 @@
-import { ReactNode } from "react";
-import { FlattenSimpleInterpolation } from "styled-components";
-
 import {
   SModal,
   SModalBody,
@@ -8,15 +5,7 @@ import {
   SModalHeader,
   SWrapper,
 } from "./styled";
-
-interface IModalProps {
-  handleClick: () => void;
-  isDisplaying: boolean;
-  modalTitle: ReactNode;
-  modalBody: ReactNode;
-  modalFooter?: ReactNode;
-  $additionalCss?: FlattenSimpleInterpolation;
-}
+import { IModalProps } from "./types";
 
 export const Modal: React.FC<IModalProps> = ({
   handleClick,

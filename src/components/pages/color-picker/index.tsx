@@ -1,25 +1,25 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
+import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
 import {
   selectImg,
   setImg,
 } from "../../../store/features/color-picker/colorPickerSlice";
-import { CloseBtn } from "../../common/close-btn/CloseBtn";
-import { Modal } from "../../common/modal/Modal";
+import { CloseBtn } from "../../common/close-btn";
+import { Modal } from "../../common/modal";
 import { SBtnTab, SGeneralBtn, SH1 } from "../../common/styled";
-import { ColorBtnsPanel } from "../../features/color-btns-panel/ColorBtnsPanel";
-import { ColorPickerCanvas } from "../../features/color-picker-canvas/ColorPickerCanvas";
-import { ImgDragAndDrop } from "../../features/img-drag-and-drop/ImgDragAndDrop";
-import { LinkForm } from "../../features/link-form/LinkForm";
+import { ColorBtnsPanel } from "../../features/color-btns-panel";
+import { ColorPickerCanvas } from "../../features/color-picker-canvas";
+import { ImgDragAndDrop } from "../../features/img-drag-and-drop";
+import { LinkForm } from "../../features/link-form";
 import { btnCss, modalCss } from "./styled";
 
-export const ColorPicker = () => {
-  const dispatch = useDispatch();
-  const img = useSelector(selectImg);
+export const ColorPicker: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const img = useAppSelector(selectImg);
 
-  const [isModalDisplaying, setIsModalDisplaying] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("file");
+  const [isModalDisplaying, setIsModalDisplaying] = useState<boolean>(false);
+  const [selectedTab, setSelectedTab] = useState<string>("file");
 
   const handleModalClick = () => {
     setIsModalDisplaying((prev) => !prev);

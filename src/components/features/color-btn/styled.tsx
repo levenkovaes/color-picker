@@ -2,10 +2,7 @@ import styled from "styled-components";
 
 import { checkDarkColor } from "../../../utils/utils";
 import { SBtn } from "../../common/styled";
-
-interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  $bgColor: string;
-}
+import { IButtonProps } from "./types";
 
 export const Button: React.FC<IButtonProps> = styled(SBtn).attrs<IButtonProps>(
   (props) => {
