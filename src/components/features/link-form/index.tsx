@@ -1,17 +1,10 @@
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 
+import { useAppDispatch } from "../../../hooks/hooks";
 import { setImg } from "../../../store/features/color-picker/colorPickerSlice";
 import { SError, SGeneralBtn, SInput } from "../../common/styled";
 import { btnCss, SForm } from "./style";
-
-interface IFormValues {
-  link: string;
-}
-
-interface ILinkFormProps {
-  handleClose: () => void;
-}
+import { IFormValues, ILinkFormProps } from "./types";
 
 export const LinkForm: React.FC<ILinkFormProps> = ({ handleClose }) => {
   const {
@@ -19,7 +12,7 @@ export const LinkForm: React.FC<ILinkFormProps> = ({ handleClose }) => {
     handleSubmit,
     formState: { errors },
   } = useForm<IFormValues>();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   return (
     <SForm

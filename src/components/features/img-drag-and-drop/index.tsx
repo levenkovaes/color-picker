@@ -1,19 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import { SBtn } from "../../common/styled";
 import { btnCss, SDropArea } from "./styled";
-
-interface IImgDragAndDropProps {
-  onUpload: (file: File) => void;
-}
+import { IImgDragAndDropProps } from "./types";
 
 export const ImgDragAndDrop: React.FC<IImgDragAndDropProps> = ({
   onUpload,
 }) => {
-  const dropAreaRef = useRef(null);
+  const dropAreaRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [isDragging, setIsDragging] = React.useState(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   useEffect(() => {
     const dropArea: any = dropAreaRef.current;

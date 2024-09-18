@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
+import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
 import {
   addColors,
   changeColor,
@@ -18,12 +18,12 @@ import { ICircle, IColor, ICoords } from "./types";
 
 export const ColorPickerCanvas: React.FC = () => {
   const canvasRef = useRef(null);
-  const dispatch = useDispatch();
-  const imgSrc = useSelector(selectImg);
+  const dispatch = useAppDispatch();
+  const imgSrc = useAppSelector(selectImg);
   const { height, width } = useWindowDimensions();
 
-  const [canvasWidth, setCanvasWidth] = useState(0);
-  const [canvasHeight, setCanvasHeight] = useState(0);
+  const [canvasWidth, setCanvasWidth] = useState<number>(0);
+  const [canvasHeight, setCanvasHeight] = useState<number>(0);
 
   const targetWidth: number =
     window.innerHeight > window.innerWidth
@@ -297,14 +297,16 @@ export const ColorPickerCanvas: React.FC = () => {
 
     //   pixels.push(rgbToHex(data[0], data[1], data[2]));
     // }
-  }, [dispatch, canvasHeight, canvasWidth]);
+  }, [dispatch, canvasHeight, canvasWidth, img]);
+
+  // TODO remove img from depend.?
 
   if (!canvasWidth) return;
 
   return (
     <SCanvas
       ref={canvasRef}
-      alt="PlaygroundCanvas"
+      alt="canvas"
       width={canvasWidth}
       height={canvasHeight}
     ></SCanvas>

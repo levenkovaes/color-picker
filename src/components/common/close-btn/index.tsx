@@ -1,8 +1,5 @@
 import { SCloseBtn } from "./styled";
-
-interface ICloseBtnProps {
-  handleClick: () => void;
-}
+import { ICloseBtnProps } from "./types";
 
 export const CloseBtn: React.FC<ICloseBtnProps> = ({ handleClick }) => {
   return <SCloseBtn onClick={handleClick}>×</SCloseBtn>;

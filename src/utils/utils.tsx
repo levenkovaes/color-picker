@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
 import { IColor } from "../components/features/color-picker-canvas/types";
+import { IWindowDimensions } from "./types";
 
-function getWindowDimensions() {
+function getWindowDimensions(): IWindowDimensions {
   const { innerWidth: width, innerHeight: height } = window;
   return {
     width,
@@ -11,7 +12,7 @@ function getWindowDimensions() {
 }
 
 export default function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState(
+  const [windowDimensions, setWindowDimensions] = useState<IWindowDimensions>(
     getWindowDimensions()
   );
 

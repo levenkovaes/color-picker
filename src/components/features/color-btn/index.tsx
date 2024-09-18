@@ -2,10 +2,7 @@ import React from "react";
 import { Slide, toast } from "react-toastify";
 
 import { Button } from "./styled";
-
-interface IColorBtnProps {
-  $bgColor: string;
-}
+import { IColorBtnProps } from "./types";
 
 export const ColorBtn: React.FC<IColorBtnProps> = ({ $bgColor }) => {
   const handleClick = () => {
