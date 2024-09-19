@@ -26,9 +26,7 @@ export const ColorPickerCanvas: React.FC = () => {
   const [canvasHeight, setCanvasHeight] = useState<number>(0);
 
   const targetWidth: number =
-    window.innerHeight > window.innerWidth
-      ? (width * 80) / 100
-      : (width * 60) / 100;
+    height > width ? (width * 80) / 100 : (width * 60) / 100;
   const targetHeight: number = (height * 50) / 100;
 
   const img = useMemo(() => {
@@ -283,7 +281,7 @@ export const ColorPickerCanvas: React.FC = () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
     };
 
-    // //random
+    // // TODO add random
     // const pixels = [];
 
     // for (let i = 0; i < 8; ++i) {
@@ -297,9 +295,7 @@ export const ColorPickerCanvas: React.FC = () => {
 
     //   pixels.push(rgbToHex(data[0], data[1], data[2]));
     // }
-  }, [dispatch, canvasHeight, canvasWidth, img]);
-
-  // TODO remove img from depend.?
+  }, [dispatch, canvasHeight, canvasWidth]);
 
   if (!canvasWidth) return;
 

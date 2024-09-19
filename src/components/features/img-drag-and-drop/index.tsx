@@ -64,7 +64,7 @@ export const ImgDragAndDrop: React.FC<IImgDragAndDropProps> = ({
 
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
-      // e.stopPropagation();
+      e.stopPropagation();
 
       counter++;
       setIsDragging(true);
@@ -72,8 +72,9 @@ export const ImgDragAndDrop: React.FC<IImgDragAndDropProps> = ({
 
     const handleDragLeave = (e: DragEvent) => {
       e.preventDefault();
-      // e.stopPropagation();
+      e.stopPropagation();
       counter--;
+
       if (counter === 0) {
         setIsDragging(false);
       }

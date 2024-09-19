@@ -13,21 +13,24 @@ import { ColorPickerCanvas } from "../../features/color-picker-canvas";
 import { ImgDragAndDrop } from "../../features/img-drag-and-drop";
 import { LinkForm } from "../../features/link-form";
 import { btnCss, modalCss } from "./styled";
+import { ModalTabEnum } from "./types";
 
 export const ColorPicker: React.FC = () => {
   const dispatch = useAppDispatch();
   const img = useAppSelector(selectImg);
 
   const [isModalDisplaying, setIsModalDisplaying] = useState<boolean>(false);
-  const [selectedTab, setSelectedTab] = useState<string>("file");
+  const [selectedTab, setSelectedTab] = useState<ModalTabEnum>(
+    ModalTabEnum.File
+  );
 
-  const handleModalClick = () => {
+  const toggleModal = () => {
     setIsModalDisplaying((prev) => !prev);
   };
 
   const onUpload = (file: File) => {
     dispatch(setImg(file));
-    handleModalClick();
+    toggleModal();
   };
 
   return (
@@ -37,7 +40,7 @@ export const ColorPicker: React.FC = () => {
         <>
           <ColorBtnsPanel />
           <ColorPickerCanvas />
-          <SGeneralBtn onClick={handleModalClick} $additionalCss={btnCss}>
+          <SGeneralBtn onClick={toggleModal} $additionalCss={btnCss}>
             Upload image
           </SGeneralBtn>
           {isModalDisplaying && (
@@ -47,29 +50,29 @@ export const ColorPicker: React.FC = () => {
                 <>
                   <div>
                     <SBtnTab
-                      onClick={() => setSelectedTab("file")}
-                      $active={selectedTab === "file"}
+                      onClick={() => setSelectedTab(ModalTabEnum.File)}
+                      $active={selectedTab === ModalTabEnum.File}
                     >
                       Choose a file
                     </SBtnTab>
                     <SBtnTab
-                      onClick={() => setSelectedTab("link")}
-                      $active={selectedTab === "link"}
+                      onClick={() => setSelectedTab(ModalTabEnum.Link)}
+                      $active={selectedTab === ModalTabEnum.Link}
                     >
                       Paste a link
                     </SBtnTab>
                   </div>
-                  <CloseBtn handleClick={handleModalClick} />
+                  <CloseBtn handleClick={toggleModal} />
                 </>
               }
               modalBody={
                 selectedTab === "file" ? (
                   <ImgDragAndDrop onUpload={onUpload} />
                 ) : (
-                  <LinkForm handleClose={handleModalClick} />
+                  <LinkForm handleClose={toggleModal} />
                 )
               }
-              handleClick={handleModalClick}
+              handleClick={toggleModal}
               isDisplaying={isModalDisplaying}
             />
           )}
