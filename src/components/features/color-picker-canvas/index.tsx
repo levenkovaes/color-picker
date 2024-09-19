@@ -205,7 +205,7 @@ export const ColorPickerCanvas: React.FC = () => {
         if (
           el.x - el.radius < x &&
           x < el.x + el.radius &&
-          el.y - el.radius < e.y &&
+          el.y - el.radius < y &&
           y < el.y + el.radius
         ) {
           target = structuredClone(el);
