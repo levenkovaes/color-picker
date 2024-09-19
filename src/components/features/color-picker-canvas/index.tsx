@@ -12,10 +12,11 @@ import useWindowDimensions, {
   checkDarkColor,
   rgbToHex,
 } from "../../../utils/utils";
+import { ModeEnum } from "../../pages/color-picker/types";
 import { SCanvas } from "./styled";
 import { ICircle, IColor, ICoords } from "./types";
 
-export const ColorPickerCanvas: React.FC = () => {
+export const ColorPickerCanvas: React.FC<{ mode: ModeEnum }> = ({ mode }) => {
   const canvasRef = useRef(null);
   const dispatch = useAppDispatch();
   const imgSrc = useAppSelector(selectImg);
@@ -87,7 +88,15 @@ export const ColorPickerCanvas: React.FC = () => {
     ).data;
     const rgbArr: IColor[] = buildRgb(imgData);
 
-    const colorsIndex = calculateColorsIndexes(rgbArr);
+    const colorsIndex =
+      mode === ModeEnum.Theme
+        ? calculateColorsIndexes(rgbArr)
+        : [
+            Math.floor(Math.random() * rgbArr.length),
+            Math.floor(Math.random() * rgbArr.length),
+            Math.floor(Math.random() * rgbArr.length),
+            Math.floor(Math.random() * rgbArr.length),
+          ];
 
     const finalColorsRgb: IColor[] = colorsIndex.map((index) => rgbArr[index]);
 
@@ -236,28 +245,11 @@ export const ColorPickerCanvas: React.FC = () => {
 
     dispatch(addColors(colorsHex));
 
-    // // TODO add random
-    // const pixels = [];
-
-    // for (let i = 0; i < 4; ++i) {
-    //   const pixel = ctx.getImageData(
-    //     Math.floor(Math.random() * canvasWidth),
-    //     Math.floor(Math.random() * canvasHeight),
-    //     1,
-    //     1
-    //   );
-    //   const data = pixel.data;
-
-    //   pixels.push(rgbToHex(data[0], data[1], data[2]));
-    // }
-
-    // console.log(pixels);
-
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
       canvas.removeEventListener("touchstart", handleMouseDown);
     };
-  }, [dispatch, canvasHeight, canvasWidth]);
+  }, [dispatch, canvasHeight, canvasWidth, mode]);
 
   if (!canvasWidth) return;
 
