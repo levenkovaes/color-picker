@@ -8,9 +8,8 @@ import {
 } from "../../../store/features/color-picker/colorPickerSlice";
 import useWindowDimensions, {
   buildRgb,
+  calculateColorsIndexes,
   checkDarkColor,
-  findBiggestColorRange,
-  quantization,
   rgbToHex,
 } from "../../../utils/utils";
 import { SCanvas } from "./styled";
@@ -88,71 +87,7 @@ export const ColorPickerCanvas: React.FC = () => {
     ).data;
     const rgbArr: IColor[] = buildRgb(imgData);
 
-    const colorsRgb: IColor[] = quantization([...rgbArr], 2);
-    const filter: string = findBiggestColorRange(rgbArr) + "-filter";
-
-    const colorsIndex: number[] = colorsRgb.map(({ r, g, b }) => {
-      let index = rgbArr.findIndex((el) => {
-        if (el.r === r && el.g === g && el.b === b) {
-          return true;
-        }
-        return false;
-      });
-
-      if (index === -1) {
-        const filtered2ColorsMatch: IColor[] = rgbArr.filter(
-          ({ r: red, g: green, b: blue }) =>
-            (red === r && green === g) ||
-            (red === r && blue === b) ||
-            (green === g && blue === b)
-        );
-
-        if (filtered2ColorsMatch.length > 0) {
-          const newColor = filtered2ColorsMatch[0];
-          index = rgbArr.findIndex((el) => {
-            if (
-              el.r === newColor.r &&
-              el.g === newColor.g &&
-              el.b === newColor.b
-            ) {
-              return true;
-            }
-            return false;
-          });
-        }
-
-        if (filtered2ColorsMatch.length === 0) {
-          const filtered1ColorMatch: IColor[] = rgbArr.filter(
-            ({ r: red, g: green, b: blue }) => {
-              switch (filter) {
-                case "r-filter":
-                  return red === r;
-                case "g-filter":
-                  return green === g;
-                case "b-filter":
-                  return blue === b;
-                default:
-                  return red === r;
-              }
-            }
-          );
-
-          const newColor: IColor = filtered1ColorMatch[0];
-          index = rgbArr.findIndex((el) => {
-            if (
-              el.r === newColor.r &&
-              el.g === newColor.g &&
-              el.b === newColor.b
-            ) {
-              return true;
-            }
-            return false;
-          });
-        }
-      }
-
-      return index;
-    });
+    const colorsIndex = calculateColorsIndexes(rgbArr);
 
     const finalColorsRgb: IColor[] = colorsIndex.map((index) => rgbArr[index]);
 

@@ -50,7 +50,7 @@ export const buildRgb = (imageData: Uint8ClampedArray) => {
   return rgbValues;
 };
 
-export const findBiggestColorRange = (rgbValues: IColor[]) => {
+const findBiggestColorRange = (rgbValues: IColor[]) => {
   let rMin = Number.MAX_VALUE;
   let gMin = Number.MAX_VALUE;
   let bMin = Number.MAX_VALUE;
@@ -83,7 +83,7 @@ export const findBiggestColorRange = (rgbValues: IColor[]) => {
   }
 };
 
-export const quantization = (rgbValues: IColor[], depth: number): IColor[] => {
+const quantization = (rgbValues: IColor[], depth: number): IColor[] => {
   const MAX_DEPTH = 4;
   if (depth === MAX_DEPTH || rgbValues.length === 0) {
     const color = rgbValues.reduce(
@@ -133,4 +133,72 @@ export const checkDarkColor = (c: string, lightness: number = 60) => {
   }
 
   return false;
+};
+
+export const calculateColorsIndexes = (rgbArr: IColor[]): number[] => {
+  const colorsRgb: IColor[] = quantization([...rgbArr], 2);
+  const filter: string = findBiggestColorRange(rgbArr) + "-filter";
+
+  return colorsRgb.map(({ r, g, b }) => {
+    let index = rgbArr.findIndex((el) => {
+      if (el.r === r && el.g === g && el.b === b) {
+        return true;
+      }
+      return false;
+    });
+
+    if (index === -1) {
+      const filtered2ColorsMatch: IColor[] = rgbArr.filter(
+        ({ r: red, g: green, b: blue }) =>
+          (red === r && green === g) ||
+          (red === r && blue === b) ||
+          (green === g && blue === b)
+      );
+
+      if (filtered2ColorsMatch.length > 0) {
+        const newColor = filtered2ColorsMatch[0];
+        index = rgbArr.findIndex((el) => {
+          if (
+            el.r === newColor.r &&
+            el.g === newColor.g &&
+            el.b === newColor.b
+          ) {
+            return true;
+          }
+          return false;
+        });
+      }
+
+      if (filtered2ColorsMatch.length === 0) {
+        const filtered1ColorMatch: IColor[] = rgbArr.filter(
+          ({ r: red, g: green, b: blue }) => {
+            switch (filter) {
+              case "r-filter":
+                return red === r;
+              case "g-filter":
+                return green === g;
+              case "b-filter":
+                return blue === b;
+              default:
+                return red === r;
+            }
+          }
+        );
+
+        const newColor: IColor = filtered1ColorMatch[0];
+        index = rgbArr.findIndex((el) => {
+          if (
+            el.r === newColor.r &&
+            el.g === newColor.g &&
+            el.b === newColor.b
+          ) {
+            return true;
+          }
+          return false;
+        });
+      }
+    }
+
+    return index;
+  });
 };
