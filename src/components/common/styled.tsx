@@ -38,12 +38,18 @@ export const SBtn = styled.button<{
   ${(props) => props.$additionalCss}
 `;
 
+export const STabWraper = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-bottom: 4px;
+`;
+
 export const SBtnTab = styled(SBtn)<{
   $active?: boolean;
 }>`
   color: var(--dark-green);
   padding: 8px 20px 8px 0;
-  margin-right: 20px;
 
   ${(props) => props.$active && `border-bottom: 1px solid var(--green)`};
 `;
