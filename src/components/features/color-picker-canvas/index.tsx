@@ -126,13 +126,22 @@ export const ColorPickerCanvas: React.FC = () => {
       ctx.stroke();
     });
 
-    const handleMouseDown = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent | TouchEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
       const bounding = canvas.getBoundingClientRect();
-      const x = Math.floor(e.clientX - bounding.left);
-      const y = Math.floor(e.clientY - bounding.top);
+      let x, y;
+
+      if (e.type === "touchstart") {
+        const event = e as TouchEvent;
+        x = Math.floor(event.touches[0].clientX - bounding.left);
+        y = Math.floor(event.touches[0].clientY - bounding.top);
+      } else {
+        const event = e as MouseEvent;
+        x = Math.floor(event.clientX - bounding.left);
+        y = Math.floor(event.clientY - bounding.top);
+      }
 
       let target: any = null;
 
@@ -155,12 +164,22 @@ export const ColorPickerCanvas: React.FC = () => {
           target.y = y;
         }
 
-        function onMouseMove(e: MouseEvent) {
+        function onMouseMove(e: MouseEvent | TouchEvent) {
           e.stopPropagation();
 
           const bounding = canvas.getBoundingClientRect();
-          const x = Math.floor(e.clientX - bounding.left);
-          const y = Math.floor(e.clientY - bounding.top);
+
+          let x, y;
+
+          if (e.type === "touchmove") {
+            const event = e as TouchEvent;
+            x = Math.floor(event.touches[0].clientX - bounding.left);
+            y = Math.floor(event.touches[0].clientY - bounding.top);
+          } else {
+            const event = e as MouseEvent;
+            x = Math.floor(event.clientX - bounding.left);
+            y = Math.floor(event.clientY - bounding.top);
+          }
 
           moveAt(x, y);
 
@@ -196,33 +215,34 @@ export const ColorPickerCanvas: React.FC = () => {
           });
         }
 
-        const handleMouseUp = (e: MouseEvent) => {
+        const handleMouseUp = (e: MouseEvent | TouchEvent) => {
           e.stopPropagation();
 
           canvas.removeEventListener("mousemove", onMouseMove);
           canvas.removeEventListener("mouseup", handleMouseUp);
+          canvas.removeEventListener("touchmove", onMouseMove);
+          canvas.removeEventListener("touchend", handleMouseUp);
         };
 
         canvas.addEventListener("mousemove", onMouseMove);
         canvas.addEventListener("mouseup", handleMouseUp);
+        canvas.addEventListener("touchmove", onMouseMove);
+        canvas.addEventListener("touchend", handleMouseUp);
       });
     };
 
     canvas.addEventListener("mousedown", handleMouseDown);
+    canvas.addEventListener("touchstart", handleMouseDown);
 
     dispatch(addColors(colorsHex));
-
-    return () => {
-      canvas.removeEventListener("mousedown", handleMouseDown);
-    };
 
     // // TODO add random
     // const pixels = [];
 
-    // for (let i = 0; i < 8; ++i) {
+    // for (let i = 0; i < 4; ++i) {
     //   const pixel = ctx.getImageData(
-    //     Math.floor(Math.random() * imgWidth),
-    //     Math.floor(Math.random() * imgHeight),
+    //     Math.floor(Math.random() * canvasWidth),
+    //     Math.floor(Math.random() * canvasHeight),
     //     1,
     //     1
     //   );
@@ -230,6 +250,13 @@ export const ColorPickerCanvas: React.FC = () => {
 
     //   pixels.push(rgbToHex(data[0], data[1], data[2]));
     // }
+
+    // console.log(pixels);
+
+    return () => {
+      canvas.removeEventListener("mousedown", handleMouseDown);
+      canvas.removeEventListener("touchstart", handleMouseDown);
+    };
   }, [dispatch, canvasHeight, canvasWidth]);
 
   if (!canvasWidth) return;
