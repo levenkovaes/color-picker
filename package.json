@@ -1,5 +1,5 @@
 {
-  "name": "canvas-playground",
+  "name": "color-picker",
   "version": "1.0.0",
   "description": "",
   "main": "webpack.common.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LevenkovaES/canvas-playground.git"
+    "url": "git+https://github.com/LevenkovaES/color-picker.git"
   },
   "keywords": [],
   "author": "Ekaterina Levenkova",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/LevenkovaES/canvas-playground/issues"
+    "url": "https://github.com/LevenkovaES/color-picker/issues"
   },
-  "homepage": "https://github.com/LevenkovaES/canvas-playground#readme",
+  "homepage": "https://github.com/LevenkovaES/color-picker#readme",
   "devDependencies": {
     "@babel/core": "^7.21.0",
     "@babel/plugin-transform-runtime": "^7.21.0",

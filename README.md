@@ -1,1 +1,1 @@
-# canvas-playground
+# color-picker
