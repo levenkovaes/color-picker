@@ -30,6 +30,15 @@ This project is a color picker tool that can extract a color theme or generate r
 ## Usage
     $ npm start
 
+## Screenshots
+![color-picker](https://github.com/user-attachments/assets/f1b31498-6e99-44cf-b59a-e550f9393ef4)
+___
+![color-picker-2](https://github.com/user-attachments/assets/51c61a27-3286-4915-8e73-3c5e973580e7)
+___
+![color-picker-3](https://github.com/user-attachments/assets/eee91c05-465c-4dfc-9294-6871ba1d5bb8)
+___
+![color-picker-4](https://github.com/user-attachments/assets/49fa630e-3d6e-4429-997f-3b16bc47df9b)
+
 ## License
 This project is licensed under the MIT license <br> 
 Copyright © 2024 [Ekaterina Levenkova](https://github.com/levenkovaes)
