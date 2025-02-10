@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
+import useWindowDimensions from "../../../hooks/useWindowDimensions";
 import {
   addColors,
   changeColor,
   selectImg,
 } from "../../../store/features/color-picker/colorPickerSlice";
-import useWindowDimensions, {
+import {
   buildRgb,
   calculateColorsIndexes,
   checkDarkColor,

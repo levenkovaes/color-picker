@@ -1,35 +1,7 @@
-import { useEffect, useState } from "react";
-
 import { IColor } from "../components/features/color-picker-canvas/types";
-import { IWindowDimensions } from "./types";
 
-function getWindowDimensions(): IWindowDimensions {
-  const { innerWidth: width, innerHeight: height } = window;
-  return {
-    width,
-    height,
-  };
-}
-
-export default function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState<IWindowDimensions>(
-    getWindowDimensions()
-  );
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions(getWindowDimensions());
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return windowDimensions;
-}
-
-function componentToHex(c: number) {
-  var hex = c.toString(16);
+function componentToHex(c: number): string {
+  const hex = c.toString(16);
   return hex.length === 1 ? "0" + hex : hex;
 }
 
@@ -50,7 +22,11 @@ export const buildRgb = (imageData: Uint8ClampedArray) => {
   return rgbValues;
 };
 
-const findBiggestColorRange = (rgbValues: IColor[]) => {
+export const findBiggestColorRange = (rgbValues: IColor[]) => {
+  if (rgbValues.length === 0) {
+    return "r";
+  }
+
   let rMin = Number.MAX_VALUE;
   let gMin = Number.MAX_VALUE;
   let bMin = Number.MAX_VALUE;
@@ -83,7 +59,11 @@ const findBiggestColorRange = (rgbValues: IColor[]) => {
   }
 };
 
-const quantization = (rgbValues: IColor[], depth: number): IColor[] => {
+export const quantization = (rgbValues: IColor[], depth: number): IColor[] => {
+  if (rgbValues.length === 0) {
+    return [];
+  }
+
   const MAX_DEPTH = 4;
   if (depth === MAX_DEPTH || rgbValues.length === 0) {
     const color = rgbValues.reduce(
